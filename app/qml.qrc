@@ -1,0 +1,15 @@
+<RCC>
+    <qresource prefix="/">
+        <file>main.qml</file>
+        <file>LoginScreen.qml</file>
+        <file>PickRaceScreen.qml</file>
+        <file>MapScreen.qml</file>
+    </qresource>
+    <qresource prefix="/images">
+        <file>background.jpg</file>
+        <file>human.jpg</file>
+        <file>orc.jpg</file>
+        <file>human_marker.png</file>
+        <file>orc_marker.png</file>
+    </qresource>
+</RCC>
