@@ -1,9 +1,8 @@
-import QtQuick 2.3
-import QtQuick.Controls 1.2 as QC
-import com.iktwo.components 1.0 as IC
+import QtQuick 2.5
+import QtQuick.Controls 1.4 as QC
 import "android" as Android
 import "utils" as Utils
-import DevDays14 1.0 as DD14
+import AzerothEarth 1.0 as AZE
 
 Utils.BaseWindow {
     id: superRoot
@@ -28,12 +27,6 @@ Utils.BaseWindow {
     width: resolutions[currentResolution]["width"]
     height: resolutions[currentResolution]["height"]
 
-    Android.ActionBar {
-        id: actionBar
-        title: "<html><font color=\"#322e2d\">Qt DEVELOPER DAYS </font> <font color=\"#5c9c1c\">2014</font></html>"
-        isScreenPortrait: superRoot.isScreenPortrait
-    }
-
     Loader {
         anchors {
             top: parent.top
@@ -51,7 +44,6 @@ Utils.BaseWindow {
     }
 
     Component.onCompleted: {
-        IC.Theme.titleBarColor = "#f3f3f3"
-
+        AZE.ImageShare.shareImage()
     }
 }

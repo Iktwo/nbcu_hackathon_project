@@ -1,6 +1,5 @@
 import QtQuick 2.3
 import com.iktwo.components 1.0 as IC
-import DevDays14 1.0
 import "../views"
 
 Item {

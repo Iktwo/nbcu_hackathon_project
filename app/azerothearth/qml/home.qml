@@ -84,10 +84,6 @@ Rectangle {
             State {
                 name: "android"
                 when: Qt.platform.os === "android"
-                PropertyChanges { target: fontI; source: "qrc:/fonts/resources/fonts/Muli-Italic.ttf" }
-                PropertyChanges { target: fontL; source: "qrc:/fonts/resources/fonts/Muli-Light.ttf" }
-                PropertyChanges { target: fontLI; source: "qrc:/fonts/resources/fonts/Muli-LightItalic.ttf" }
-                PropertyChanges { target: font; source: "qrc:/fonts/resources/fonts/Muli-Regular.ttf" }
                 PropertyChanges {
                     target: __theme
                 }
@@ -100,7 +96,6 @@ Rectangle {
     FontLoader { id: fontLI }
     FontLoader { id: font }
 
-    // UI
     Views.Header {
         id: _Header
         z: 2

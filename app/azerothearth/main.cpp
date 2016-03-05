@@ -5,9 +5,11 @@
 #include <qqml.h>
 #include <QCursor>
 #include <QPixmap>
-#include "src/screenvalues.h"
 #include <QDebug>
 #include <QWidget>
+
+#include "src/screenvalues.h"
+#include "src/imageshare.h"
 
 #define QML_DEVELOPMENT "qrc:/qml/dev.qml"
 #define SIM false
@@ -26,6 +28,16 @@ static QObject *screen_values_provider(QQmlEngine *engine, QJSEngine *scriptEngi
     return screenValues;
 }
 
+static QObject *image_share_provider(QQmlEngine *engine, QJSEngine *scriptEngine)
+{
+    Q_UNUSED(engine)
+    Q_UNUSED(scriptEngine)
+
+    ImageShare *imageShare= new ImageShare();
+    return imageShare;
+}
+
+
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
@@ -35,6 +47,7 @@ int main(int argc, char *argv[])
     QString mainQml = QStringLiteral(QML_DEVELOPMENT);
 
     qmlRegisterSingletonType<ScreenValues>("AzerothEarth", 1, 0, "ScreenValues", screen_values_provider);
+    qmlRegisterSingletonType<ImageShare>("AzerothEarth", 1, 0, "ImageShare", image_share_provider);
 
     /// TODO: Q_OS_BLACKBERRY || Q_OS_WINPHONE
 

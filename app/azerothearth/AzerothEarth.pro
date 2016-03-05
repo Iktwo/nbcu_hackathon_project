@@ -3,7 +3,8 @@ TEMPLATE = app
 QT += qml quick widgets sql multimedia network
 
 SOURCES += main.cpp \
-    src/screenvalues.cpp
+    src/screenvalues.cpp \
+    src/imageshare.cpp
 
 RESOURCES += qml.qrc
 
@@ -51,4 +52,9 @@ lupdate_only{
 }
 
 HEADERS += \
-    src/screenvalues.h
+    src/screenvalues.h \
+    src/imageshare.h
+
+DISTFILES += \
+    src/ImageShare.qml \
+    android/src/com/azerothearth/MainActivity.java
