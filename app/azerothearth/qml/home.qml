@@ -53,6 +53,10 @@ Rectangle {
 
             return "#"+RR+GG+BB;
         }
+
+        function dp(v) {
+            return AZE.ScreenValues.dp*v
+        }
     }
 
     property bool isApple : Qt.platform.os === "ios"
@@ -111,5 +115,11 @@ Rectangle {
         Behavior on scale { NumberAnimation { duration: 350; easing.type: Easing.OutCubic} }
 
         z: 1
+    }
+
+    Views.PickRaceScreen {
+        anchors.fill: parent
+
+        z: 2
     }
 }
