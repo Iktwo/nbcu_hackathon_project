@@ -15,6 +15,8 @@ Rectangle {
 
     property var allocations: ({})
 
+    property var onFire: []
+
     ListModel {
         id: _ListModelClaimed
     }
@@ -31,6 +33,16 @@ Rectangle {
             }
 
             root.updateClosest()
+
+            onFire = []
+
+            var x = []
+
+            for (var j = 0; j < 4; ++j) {
+                x.push(Math.floor(Math.random() * (_ListModelPois.count - 1)))
+            }
+
+            onFire = x
         });
 
         _parse.getResourcePois({ }, function(result) {
@@ -182,7 +194,7 @@ Rectangle {
                         id: _ItemBase
 
                         property int type: Math.round(Math.random() * (1))
-                        property int onFire: Math.round(Math.random() * (5 - 1) + 1) === 1
+                        property bool onFire: root.onFire.indexOf(index) != -1
 
                         anchors.horizontalCenter: parent.horizontalCenter
 
@@ -600,24 +612,6 @@ Rectangle {
                     width: 1
                 }
 
-                Label {
-                    width: parent.width
-
-                    horizontalAlignment: "AlignHCenter"
-
-                    color: "#ffffff"
-                    font.pixelSize: __theme.dp(60)
-                    text: _parse.userObject.username
-                    wrapMode: Text.Wrap
-                    maximumLineCount: 2
-                    elide: "ElideRight"
-                }
-
-                Item {
-                    height: __theme.dp(10)
-                    width: 1
-                }
-
                 Row {
                     anchors {
                         left: parent.left; leftMargin: __theme.dp(16)
@@ -636,49 +630,79 @@ Rectangle {
 
                         anchors.verticalCenter: parent.verticalCenter
 
-                        height: __theme.dp(180)
-                        width: __theme.dp(180)
+                        height: __theme.dp(200)
+                        width: __theme.dp(200)
                         source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
                     }
 
-                    Item {
-                        height: 1
-                        width: __theme.dp(4)
-                    }
+                    Column {
+                        anchors.verticalCenter: _ImageType2.verticalCenter
+                        width: parent.width - x
+                        //height: _ImageType2.height
 
-                    Smoke {
-                        anchors {
-                            verticalCenter: parent.verticalCenter
-                            verticalCenterOffset: __theme.dp(36)
+                        Row {
+                            width: parent.width
+
+                            Item {
+                                height: 1
+                                width: __theme.dp(16)
+                            }
+
+                            Label {
+                                width: parent.width
+
+                                color: "#ffffff"
+                                font.pixelSize: __theme.dp(60)
+                                text: _parse.userObject.username
+                                wrapMode: Text.Wrap
+                                maximumLineCount: 2
+                                elide: "ElideRight"
+                            }
                         }
 
-                        height: __theme.dp(80)
-                        width: __theme.dp(80)
-                    }
+                        Row {
+                            width: parent.width
 
-                    Item {
-                        height: 1
-                        width: __theme.dp(4)
-                    }
+                            Item {
+                                height: 1
+                                width: __theme.dp(4)
+                            }
 
-                    Label {
-                        id: _LabelStats2
+                            Smoke {
+                                id: _SmokeT
 
-                        anchors.verticalCenter: parent.verticalCenter
+                                anchors {
+                                    verticalCenter: parent.verticalCenter
+                                    verticalCenterOffset: __theme.dp(36)
+                                }
 
-                        color: "#ffffff"
-                        font.pixelSize: __theme.dp(60)
-                        text: _parse.userObject.resourceTypeGoldCount
-                        wrapMode: Text.Wrap
-                        maximumLineCount: 2
-                        elide: "ElideRight"
+                                height: __theme.dp(80)
+                                width: __theme.dp(80)
+                            }
 
-                        Component.onCompleted: console.log("Userdata:", JSON.stringify(_parse.userObject))
-                    }
+                            Item {
+                                height: 1
+                                width: __theme.dp(4)
+                            }
 
-                    Item {
-                        height: 1
-                        width: __theme.dp(10)
+                            Label {
+                                id: _LabelStats2
+
+                                anchors.verticalCenter: parent.verticalCenter
+
+                                color: "#ffffff"
+                                font.pixelSize: __theme.dp(60)
+                                text: _parse.userObject.resourceTypeGoldCount + " GOLD"
+                                wrapMode: Text.Wrap
+                                maximumLineCount: 2
+                                elide: "ElideRight"
+                            }
+
+                            Item {
+                                height: 1
+                                width: __theme.dp(10)
+                            }
+                        }
                     }
                 }
             }
