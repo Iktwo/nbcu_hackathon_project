@@ -15,6 +15,47 @@ Rectangle {
 
     property var allocations: ({})
 
+    Fire {
+        id: __Fire
+        //        height: parent.height
+        //        width: parent.width
+        width: __theme.dp(128)
+        height: __theme.dp(128)
+
+
+        opacity: 0.4
+        visible: false
+    }
+
+    Smoke {
+        id: __SmokeOrc
+        width: __theme.dp(128)
+        height: __theme.dp(128)
+
+        smokeColor: colors.orc
+        opacity: 0.8
+        visible: false
+    }
+
+    Smoke {
+        id: __SmokeHuman
+        width: __theme.dp(128)
+        height: __theme.dp(128)
+
+
+        smokeColor: colors.human
+        opacity: 0.8
+        visible: false
+    }
+    Smoke {
+        id: __SmokeGold
+        width: __theme.dp(128)
+        height: __theme.dp(128)
+
+        opacity: 0.8
+        visible: false
+    }
+
     ListModel {
         id: _ListModelClaimed
     }
@@ -182,7 +223,7 @@ Rectangle {
                         id: _ItemBase
 
                         property int type: Math.round(Math.random() * (1))
-                        property int onFire: Math.round(Math.random() * (5 - 1) + 1) === 1
+                        property bool onFire: Math.round(Math.random() * (5 - 1) + 1) === 1
 
                         anchors.horizontalCenter: parent.horizontalCenter
 
@@ -200,23 +241,22 @@ Rectangle {
                         Component {
                             id: _ComponentA
 
-                            Fire {
-                                height: parent.height
-                                width: parent.width
-                                y: -height * 0.4
-
-                                opacity: 0.4
+                            ShaderEffectSource {
+//                                anchors.fill: parent
+                                sourceItem: __Fire
+                                y: __theme.dp(-50)
+                                x: __theme.dp(-50)
+                                sourceRect: Qt.rect(-100, -100, width + 100, height + 100)
                             }
                         }
 
                         Component {
                             id: _ComponentB
 
-                            Smoke {
-                                anchors.fill: parent
-
-                                smokeColor: parent.type === 1 ? colors.orc : colors.human
-                                opacity: 0.8
+                            ShaderEffectSource {
+//                                anchors.fill: parent
+                                sourceItem: _ItemBase.type === 1 ? __SmokeOrc : __SmokeHuman
+                                sourceRect: Qt.rect(-100, -100, width + 100, height + 100)
                             }
                         }
 
@@ -270,12 +310,10 @@ Rectangle {
                     height: __theme.dp(Math.min(15 + (4 * _Map.zoomLevel), 97))
                     width: __theme.dp(Math.min(15 + (4 * _Map.zoomLevel), 97))
 
-                    Smoke {
-                        id: _Smoke
-
+                    ShaderEffectSource {
                         anchors.fill: parent
-
-                        opacity: 0.8
+                        sourceItem: __SmokeGold
+                        sourceRect: Qt.rect(-100, -100, width + 100, height + 100)
                     }
 
                     MouseArea {
