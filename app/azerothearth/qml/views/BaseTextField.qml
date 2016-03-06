@@ -65,6 +65,7 @@ Rectangle {
         anchors.fill: parent
         visible: false
         activeFocusOnPress: true
+        inputMethodHints: Qt.ImhNoPredictiveText
 
         property string passwordText: {
             var t = "";
