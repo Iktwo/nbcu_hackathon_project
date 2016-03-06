@@ -36,16 +36,20 @@ Item {
         }
 
         Emitter {
+            id: flame
+
+            property int area: 90
+
             anchors.centerIn: parent
             group: "flame"
 
             emitRate: 120
             lifeSpan: 1200
-            size: 20
-            endSize: 10
-            sizeVariation: 10
+            size: area
+            endSize: area / 6
+            sizeVariation: area / 2
             acceleration: PointDirection { y: -40 }
-            velocity: AngleDirection { angle: 270; magnitude: 20; angleVariation: 22; magnitudeVariation: 5 }
+            velocity: AngleDirection { angle: 270; magnitude: flame.area / 2; angleVariation: 22; magnitudeVariation: flame.area / 12 }
         }
 
         TrailEmitter {
@@ -59,11 +63,11 @@ Item {
             emitRatePerParticle: 1
             lifeSpan: 2400
             lifeSpanVariation: 400
-            size: 16
-            endSize: 8
-            sizeVariation: 8
+            size: flame.area / 3
+            endSize: flame.area / 6
+            sizeVariation: flame.area / 5
             acceleration: PointDirection { y: -40 }
-            velocity: AngleDirection { angle: 270; magnitude: 40; angleVariation: 22; magnitudeVariation: 5 }
+            velocity: AngleDirection { angle: 270; magnitude: flame.area / 2; angleVariation: 22; magnitudeVariation: magnitude / 4 }
         }
 
         TrailEmitter {
@@ -75,11 +79,11 @@ Item {
 
             emitRatePerParticle: 4
             lifeSpan: 2400
-            size: 36
-            endSize: 24
+            size: flame.area / 1.5
+            endSize: flame.area / 1.8
             sizeVariation: 12
             acceleration: PointDirection { y: -40 }
-            velocity: AngleDirection { angle: 270; magnitude: 40; angleVariation: 22; magnitudeVariation: 5 }
+            velocity: AngleDirection { angle: 270; magnitude: flame.area / 2; angleVariation: 22; magnitudeVariation: magnitude / 4 }
         }
     }
 }

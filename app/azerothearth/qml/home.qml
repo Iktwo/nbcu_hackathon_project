@@ -68,8 +68,13 @@ Rectangle {
             return "#"+RR+GG+BB;
         }
 
-        function dp(v) {
-            return AZE.ScreenValues.dp*v
+        function dp(value) {
+            var factor = $*0.45
+            if(Qt.platform.os === "osx")
+                return value
+            if(Qt.platform.os === "ios")
+                return value
+            return factor*value
         }
     }
 
