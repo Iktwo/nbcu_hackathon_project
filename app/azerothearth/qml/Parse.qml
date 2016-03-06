@@ -319,6 +319,9 @@ Item {
 
         internal.get(urlUserLogin, o, function(result, error) {
             var errorString = "";
+            if (result.code == 201 || result.code == 101) {
+                error = true;
+            }
             if (error) {
                 if (result.code == 201 || result.code == 101) {
                     errorString = root.errorStringPasswordIncorrect;

@@ -27,7 +27,7 @@ Item {
 
         actionButtonText: qsTr("Sign Up");
         onActionButtonClicked: {
-            var userObject = _parse.buildUserObject(usernameTextField.text, passwordTextField.text);
+            var userObject = _parse.buildUserObject(usernameTextField.text, passwordTextField.realText);
             userObject.characterType = root.characterType || "CHARACTERTYPE_UNKNOWN";
 
             if (__positionSource.coordinate) {
