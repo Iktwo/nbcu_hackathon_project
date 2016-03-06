@@ -167,11 +167,10 @@ Rectangle {
         z: 3
     }
 
-    Views.MapScreen {
-        id: _MapScreen
-
+    Loader {
         anchors.fill: parent
-
+        source: "views/MapScreen.qml"
+        active: _parse.userObject !== null
         z: 2
     }
 
