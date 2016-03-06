@@ -11,8 +11,6 @@ Rectangle {
     anchors.top: parent.top
     anchors.left: parent.left
     anchors.right: parent.right
-    height: __theme.headerHeight
-    color: __theme.lightGrey
     clip: true
 
     Rectangle {

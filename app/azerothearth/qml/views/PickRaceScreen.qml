@@ -5,7 +5,7 @@ import "../utils" as Utils
 Rectangle {
     id: root
 
-    signal selected
+    signal close
 
     ListView {
         id: _ListViewImages
@@ -33,6 +33,10 @@ Rectangle {
                 onBackClicked: {
                     _ListViewImages.resetToInitialState();
                 }
+
+                onRegistrationSuccessful: {
+                    root.close();
+                }
             }
         }
 
@@ -45,6 +49,10 @@ Rectangle {
 
                 onBackClicked: {
                     _ListViewImages.resetToInitialState();
+                }
+
+                onRegistrationSuccessful: {
+                    root.close();
                 }
             }
         }

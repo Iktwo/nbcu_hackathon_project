@@ -1,6 +1,10 @@
 import QtQuick 2.3
+import QtPositioning 5.5
+import QtLocation 5.5
+
 import "views" as Views
 import "utils" as Utils
+
 import AzerothEarth 1.0 as AZE
 
 Rectangle {
@@ -8,25 +12,35 @@ Rectangle {
 
     property bool isScreenPortrait: height >= width
 
-    property alias header: _Header
-
     color: "#ffffff"
     width:  parent.width
     height: parent.height
     focus: true
+
+    Parse {
+        id: _parse
+    }
+
+    property alias __positionSource: _PositionSource
+
+    PositionSource {
+        id: _PositionSource
+
+        property var coordinate: null
+
+        active: true
+        updateInterval: 120000 // 2 mins
+
+        onPositionChanged: {
+            coordinate = position.coordinate;
+        }
+    }
 
     property alias __theme : _QtObject_Theme
 
     QtObject {
         id: _QtObject_Theme
 
-        property color qtColorLightGreen : "#7fc438"
-        property color qtColorDarkGreen : "#026426"
-        property color qtColorMediumGreen : "#5c9c1c"
-        property color tankGreen : "#484f40"
-        property color lightGrey : "#f3f3f3"
-        property color lightGreyAccent : "#d1d1d0"
-        property color lightGreyAccentSecondary : "#eeeeee"
         property alias fontFamily: font.name
         property int topMargin: 40
 
@@ -100,14 +114,10 @@ Rectangle {
     FontLoader { id: fontLI }
     FontLoader { id: font }
 
-    Views.Header {
-        id: _Header
-        z: 2
-    }
 
     Item {
         id: _Item_PageContainer
-        anchors.top: _Header.bottom
+        anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.bottom: parent.bottom
@@ -119,6 +129,11 @@ Rectangle {
 
     Views.PickRaceScreen {
         anchors.fill: parent
+
+        onClose: {
+            visible = false;
+            // DO SHIT
+        }
 
         z: 2
     }

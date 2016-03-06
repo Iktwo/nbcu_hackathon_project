@@ -1,6 +1,6 @@
 TEMPLATE = app
 
-QT += qml quick widgets sql multimedia network
+QT += qml quick widgets sql multimedia network location
 
 SOURCES += main.cpp \
     src/screenvalues.cpp \
