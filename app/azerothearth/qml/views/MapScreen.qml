@@ -135,7 +135,7 @@ Rectangle {
         id: _PositionSource
 
         active: true
-        updateInterval: 5000
+        updateInterval: 1000
         onPositionChanged:  {
             var currentPosition = _PositionSource.position.coordinate
             _MapQuickItemCurrentPosition.coordinate = currentPosition
@@ -371,8 +371,8 @@ Rectangle {
 
 
             onClicked: {
-                if (_Map.zoomLevel < 17)
-                    _Map.zoomLevel = 17
+                if (_Map.zoomLevel < 18)
+                    _Map.zoomLevel = 18
 
                 _Map.center = lastPosition
             }
