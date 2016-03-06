@@ -181,18 +181,43 @@ Rectangle {
                     Item {
                         id: _ItemBase
 
+                        property int type: Math.round(Math.random() * (1))
+                        property int onFire: Math.round(Math.random() * (5 - 1) + 1) === 1
+
                         anchors.horizontalCenter: parent.horizontalCenter
 
                         height: __theme.dp(Math.min(35 + (8 * _Map.zoomLevel), 128))
                         width: __theme.dp(Math.min(35 + (8 * _Map.zoomLevel), 128))
 
-                        property int type: Math.round(Math.random() * (1));
-
-                        Smoke {
+                        Loader {
                             anchors.fill: parent
 
-                            smokeColor: parent.type === 1 ? colors.orc : colors.human
-                            opacity: 0.8
+                            sourceComponent: parent.onFire ? _ComponentA : _ComponentB
+                            asynchronous: true
+                            z: parent.onFire ? 3 : 1
+                        }
+
+                        Component {
+                            id: _ComponentA
+
+                            Fire {
+                                height: parent.height
+                                width: parent.width
+                                y: -height * 0.4
+
+                                opacity: 0.4
+                            }
+                        }
+
+                        Component {
+                            id: _ComponentB
+
+                            Smoke {
+                                anchors.fill: parent
+
+                                smokeColor: parent.type === 1 ? colors.orc : colors.human
+                                opacity: 0.8
+                            }
                         }
 
                         Image {
@@ -203,7 +228,7 @@ Rectangle {
 
                             source: parent.type === 1 ? "../img/marker-orc.png" : "../img/marker-human.png"
                             fillMode: Image.PreserveAspectFit
-                            z: 9
+                            z: 2
                         }
                     }
 
