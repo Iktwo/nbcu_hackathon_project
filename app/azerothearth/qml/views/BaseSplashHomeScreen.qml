@@ -10,7 +10,11 @@ Item {
     id: root
 
     function close() {
-        visible = false;
+        _stateGroup.state = "signUp"
+    }
+
+    function reset() {
+        _stateGroup.state = "ready";
     }
 
     StateGroup {
@@ -320,7 +324,7 @@ Item {
                                      }
                                      __dialog.showWithMessage(msg);
                                  } else {
-                                     __dialog.showWithMessage("Welcome back to AzerothEarth, " + usernameTextField.text + ".\nGAME ON.");
+                                     __dialog.showWithMessage("Welcome back to AzerothEarth, " + usernameTextField.text + ".\n\nGAME ON.");
                                      root.close();
                                  }
                              });

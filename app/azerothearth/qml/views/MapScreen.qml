@@ -359,7 +359,7 @@ Rectangle {
 
             Item {
                 height: 1
-                width: _theme.dp(4)
+                width: __theme.dp(4)
             }
 
             Image {
@@ -367,14 +367,14 @@ Rectangle {
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                height: _theme.dp(40)
-                width: _theme.dp(40)
+                height: __theme.dp(40)
+                width: __theme.dp(40)
                 source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
             }
 
             Item {
                 height: 1
-                width: _theme.dp(4)
+                width: __theme.dp(4)
             }
 
             Smoke {
@@ -389,7 +389,7 @@ Rectangle {
 
             Item {
                 height: 1
-                width: _theme.dp(4)
+                width: __theme.dp(4)
             }
 
             Label {
@@ -455,9 +455,9 @@ Rectangle {
 
         anchors.fill: parent
 
-        color: "#88000000"
         opacity: 0
         enabled: false
+        color: "#88000000"
 
         MouseArea {
             anchors.fill: parent
@@ -472,6 +472,7 @@ Rectangle {
                 horizontalCenter: _RectangleMainStats.horizontalCenter
             }
 
+            color: "#AA000000"
             width: _RectangleMainStats.width * 0.5
             text: "Share"
             onClicked: {
@@ -493,12 +494,37 @@ Rectangle {
 
             color: "#000000"
 
-            radius: __theme.dp(22)
+            gradient: Gradient {
+                GradientStop {
+                    position: 0.25
+                    color: "#664f10"
+                }
+                GradientStop {
+                    position: 1.0
+                    color: "#000000"
+                }
+            }
+
+            Rectangle {
+                anchors.fill: parent
+                color: "#000000"
+                opacity: 0.65
+
+                border.width: 2
+                border.color: "#604411"
+            }
+
+            Image {
+                anchors.fill: parent
+                fillMode: Image.Tile
+                source: "../img/pattern-leather.jpg"
+                opacity: 0.25
+            }
+
             height: Math.max(_ColumnStatsContent.height + __theme.dp(100), __theme.dp(400))
 
             Rectangle {
                 anchors.fill: parent
-                radius: parent.radius
 
                 color: "#00000000"
 
@@ -561,7 +587,7 @@ Rectangle {
 
                     Item {
                         height: 1
-                        width: _theme.dp(4)
+                        width: __theme.dp(4)
                     }
 
                     Image {
@@ -569,14 +595,14 @@ Rectangle {
 
                         anchors.verticalCenter: parent.verticalCenter
 
-                        height: _theme.dp(180)
-                        width: _theme.dp(180)
+                        height: __theme.dp(180)
+                        width: __theme.dp(180)
                         source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
                     }
 
                     Item {
                         height: 1
-                        width: _theme.dp(4)
+                        width: __theme.dp(4)
                     }
 
                     Smoke {
@@ -591,7 +617,7 @@ Rectangle {
 
                     Item {
                         height: 1
-                        width: _theme.dp(4)
+                        width: __theme.dp(4)
                     }
 
                     Label {

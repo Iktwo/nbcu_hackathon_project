@@ -17,6 +17,10 @@ Rectangle {
         enabled = true
     }
 
+    function reset() {
+        _splashHomeScreen.visible = true;
+    }
+
     ListView {
         id: _ListViewImages
         // This is for sign-up

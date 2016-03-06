@@ -23,6 +23,7 @@ Rectangle {
             onClicked: {
                 console.log("## LOGOUT");
                 _parse.logoutUser();
+                _splashScreen.reset();
                 _splashScreen.open();
             }
         }
@@ -173,6 +174,7 @@ Rectangle {
 
         onClosing: {
             close();
+            reset();
         }
 
         z: 3
