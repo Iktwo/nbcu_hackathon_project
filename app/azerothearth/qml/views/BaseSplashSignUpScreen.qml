@@ -28,20 +28,67 @@ Item {
         }
     }
 
-    Image {
-        id: _imageLogo
+    Column {
+        id: _itemText
         anchors.bottom: parent.bottom
-        anchors.horizontalCenter: parent.horizontalCenter
-        anchors.bottomMargin: __theme.dp(100)
+        anchors.left: parent.left
+        anchors.right: parent.right
+        anchors.bottomMargin: __theme.dp(80)
 
-        source: "../img/main-logo.png"
+        spacing: __theme.dp(30)
+
+        Label {
+            id: _labelDescription
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: __theme.dp(60)
+            anchors.rightMargin: anchors.leftMargin
+            wrapMode: Text.WordWrap
+
+            horizontalAlignment: Text.AlignHCenter
+
+            text: "Choose your side"
+            font.capitalization: Font.AllUppercase
+            color: "#c7c9b4"
+        }
+        Label {
+            id: _labelOrc
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: __theme.dp(60)
+            anchors.rightMargin: anchors.leftMargin
+            wrapMode: Text.WordWrap
+            font.pixelSize: __theme.dp(42)
+
+            horizontalAlignment: Text.AlignHCenter
+
+            text: "Swipe right\nto join the Orc Army"
+            font.capitalization: Font.AllUppercase
+            color: "#ef492f" //"#c7c9b4"
+        }
+
+        Label {
+            id: _labelHuman
+            anchors.left: parent.left
+            anchors.right: parent.right
+            anchors.leftMargin: __theme.dp(60)
+            anchors.rightMargin: anchors.leftMargin
+            wrapMode: Text.WordWrap
+            font.pixelSize: __theme.dp(42)
+
+            horizontalAlignment: Text.AlignHCenter
+
+            text: "Swipe left\nto join the Human Collective"
+            font.capitalization: Font.AllUppercase
+            color: "#387ee5" //"#c7c9b4"
+        }
     }
 
     MouseArea {
         id: _mouseAreaLeft
         anchors.top: parent.top
         anchors.left: parent.left
-        anchors.bottom: _imageLogo.top
+        anchors.bottom: _itemText.top
         width: parent.width / 2
 
         Utils.Fill { }
@@ -55,7 +102,7 @@ Item {
         id: _mouseAreaRight
         anchors.top: parent.top
         anchors.right: parent.right
-        anchors.bottom: _imageLogo.top
+        anchors.bottom: _itemText.top
         width: parent.width / 2
 
         Utils.Fill { }

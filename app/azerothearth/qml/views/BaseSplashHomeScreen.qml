@@ -53,6 +53,14 @@ Item {
                     anchors.bottomMargin: -1*__theme.dp(100)
                     opacity: 0.0
                 }
+            },
+            State {
+                name: "signUp"
+                PropertyChanges {
+                    target: root
+                    opacity: 0.0
+                    visible: false
+                }
             }
         ]
         transitions: [
@@ -159,6 +167,48 @@ Item {
                         property: "visible"
                     }
                 }
+            },
+            Transition {
+                from: "*"
+                to: "signUp"
+                SequentialAnimation {
+                    ParallelAnimation {
+                        NumberAnimation {
+                            target: _imageLogo
+                            property: "anchors.bottomMargin"
+                            duration: 750
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            target: _columnMainTwoButtons
+                            properties: "anchors.bottomMargin"
+                            duration: 750
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            target: _fadeBottom
+                            properties: "height"
+                            duration: 750
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            target: _fadeBottom
+                            properties: "opacity"
+                            duration: 650
+                            easing.type: Easing.OutCubic
+                        }
+                        NumberAnimation {
+                            target: root
+                            properties: "opacity"
+                            duration: 650
+                            easing.type: Easing.OutCubic
+                        }
+                    }
+                    PropertyAction {
+                        target: root
+                        property: "visible"
+                    }
+                }
             }
         ]
     }
@@ -225,8 +275,8 @@ Item {
         anchors.bottomMargin: -1*height
         spacing: __theme.dp(40)
 
-        Controls.Button {
-            width: parent.width
+        BaseButton {
+            width: parent.width - parent.spacing/2
             height: __theme.dp(120)
             text: "Login"
 
@@ -236,13 +286,13 @@ Item {
             }
         }
 
-        Controls.Button {
-            width: parent.width
+        BaseButton {
+            width: parent.width - parent.spacing/2
             height: __theme.dp(120)
             text: "Sign Up"
 
             onClicked: {
-                root.visible = false;
+                _stateGroup.state = "signUp";
             }
         }
     }

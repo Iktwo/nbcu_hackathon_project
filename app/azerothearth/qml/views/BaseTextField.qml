@@ -59,6 +59,7 @@ Rectangle {
         fillMode: Image.Tile
         opacity: 0.2
     }
+
     Controls.TextField {
         id: _textFieldDummy
         anchors.fill: parent
@@ -118,7 +119,7 @@ Rectangle {
         anchors.topMargin: __theme.dp(10)
         anchors.bottomMargin: anchors.topMargin
 
-        font.pixelSize: __theme.dp(root.height*0.45)
+        font.pixelSize: __theme.dp(root.height*0.40)
 
         verticalAlignment: Text.AlignVCenter
 

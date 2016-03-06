@@ -40,7 +40,7 @@ Column {
         anchors.right: parent.right
         height: __theme.dp(120)
 
-        Controls.Button {
+        BaseButton {
             id: _buttonSignUp
             width: parent.width / 2
             height: parent.height
@@ -48,7 +48,7 @@ Column {
             onClicked: root.actionButtonClicked()
         }
 
-        Controls.Button {
+        BaseButton {
             width: parent.width / 2
             height: parent.height
             text: "Back"

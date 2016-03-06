@@ -66,7 +66,7 @@ Rectangle {
     QtObject {
         id: _QtObject_Theme
 
-        property alias fontFamily: font.name
+        property alias fontFamily: _fontLoaderDIN.name
         property int topMargin: 40
 
         property int headerHeight: 128
@@ -126,7 +126,7 @@ Rectangle {
                 name: "ios"
                 PropertyChanges {
                     target: __theme;
-                    fontFamily: "Avenir Next"
+//                    fontFamily: "Avenir Next"
                 }
             },
             State {
@@ -143,6 +143,17 @@ Rectangle {
     FontLoader { id: fontL }
     FontLoader { id: fontLI }
     FontLoader { id: font }
+
+    FontLoader {
+        id: _fontLoaderDIN
+        source: "img/AIRBORNE.ttf"
+
+        onStatusChanged: {
+            if (status === FontLoader.Error) {
+                console.warn("## FAILED TO LOAD")
+            }
+        }
+    }
 
     Item {
         id: _Item_PageContainer

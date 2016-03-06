@@ -10,4 +10,5 @@ Text {
         }
     }
     font.pixelSize: 34
+    font.letterSpacing: 1.2
 }
