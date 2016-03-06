@@ -8,12 +8,19 @@ Item {
     readonly property bool isUserAuthenticated: internal.sessionToken !== ""
 
     property var userObject: null
+    property var user2Object: ({})
+
 
     property string version: "1"
     property string urlBase: "https://api.parse.com/"+version+"/"
     property string urlClasses: urlBase + "classes/"
     property string urlUsers: urlBase + "users/"
     property string urlUserLogin: urlBase + "login/"
+
+    property string url2Base: "http://nbcu.mybluemix.net/api/"
+    property string url2UserCreate: url2Base + "join"
+    property string url2PlayerUpdate: url2Base + "player/update"
+    property string url2UserLogin: url2Base + "login"
 
     property string classNamePoi: "poi"
     property string classNameResource: "resource"
@@ -34,6 +41,21 @@ Item {
 
     property int goldCostPerSoldier: 5
 
+    function monuments_from_server(callback){
+        var xhr = new XMLHttpRequest();
+        xhr.open("GET", "http://nbcu.mybluemix.net/api/landmarks/getnearby");
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                var result = JSON.parse(xhr.responseText);
+                if (callback) {
+                    callback(result);
+                }
+            }
+        }
+    }
+
     function foursquare_scrapeMonuments(callback) {
         var xhr = new XMLHttpRequest();
         xhr.open("GET", foursquare.urlVenues_Monuments, true);
@@ -49,6 +71,33 @@ Item {
         }
 
         xhr.send();
+    }
+
+    function saveUserWithClass(callback){
+        internal.post("http://nbcu.mybluemix.net/api/player/update/", characterShortName, function(result, error){
+            var errorString = "";
+            if (error) {
+                if (result.code === 202) {
+                    errorString = root.errorStringUsernameTaken;
+                }
+                callback({
+                             status: 0,
+                             result: result,
+                             errorString: errorString
+                         });
+            } else {
+                try {
+                    internal.sessionToken = result.sessionToken;
+                } catch (ex) {
+                    console.warn("user signed in successfully but no session token not found");
+                }
+                callback({
+                             status: 1,
+                             result: result,
+                             errorString: errorString
+                         });
+            }
+        });
     }
 
     function foursquare_scrapeVenuesForResources(callback) {
@@ -256,22 +305,51 @@ Item {
             return;
         }
 
-        if (userObject.username.length < 3) {
+        if (userObject.username.length < 4) {
             callback({ status: 0, errorString: root.errorStringUsernameTooShort });
             return;
         }
 
-        if (userObject.password.length < 3) {
+        if (userObject.password.length < 4) {
             callback({ status: 0, errorString: root.errorStringPasswordTooShort });
             return;
         }
+        var characterShortName = userObject.characterType === "CHARACTERTYPE_ORC" ? "orc" : "human"
 
         console.log("attempting to register user:");
         console.log(JSON.stringify(userObject, null, 2));
+        user2Object.raceName = characterShortName;
+        user2Object.username = userObject.username.toLowerCase();
+        user2Object.password = userObject.password;
 
         userObject.username = userObject.username.toLowerCase();
         // Give the user 1 resourceTypeGold
         userObject.resourceTypeGoldCount = 1;
+
+        internal.post(url2UserCreate, user2Object, function (res, err){
+            var errorString = "";
+            if (error) {
+                if (result.code === 202) {
+                    errorString = root.errorStringUsernameTaken;
+                }
+                callback({
+                             status: 0,
+                             result: result,
+                             errorString: errorString
+                         });
+            } else {
+                try {
+                    internal.sessionToken = result.sessionToken;
+                } catch (ex) {
+                    console.warn("user signed in successfully but no session token not found");
+                }
+                callback({
+                             status: 1,
+                             result: result,
+                             errorString: errorString
+                         });
+            }
+        });
 
         internal.post(urlUsers, userObject, function(result, error) {
             var errorString = "";
@@ -631,7 +709,6 @@ Item {
                 var finalObject = {
                     requests : batchRequest
                 }
-
                 internal.post(urlBase + "batch", finalObject, function(result) {
                     console.log("RESPONSE", "battle totally done");
                     console.log(JSON.stringify(result))

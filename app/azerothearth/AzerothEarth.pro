@@ -9,7 +9,7 @@ SOURCES += main.cpp \
 RESOURCES += qml.qrc
 
 osx {
-    QMAKE_MAC_SDK = macosx10.9
+    QMAKE_MAC_SDK = macosx
 }
 
 

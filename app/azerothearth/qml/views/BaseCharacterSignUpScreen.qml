@@ -54,6 +54,7 @@ Item {
             var userObject = _parse.buildUserObject(usernameTextField.text, passwordTextField.realText);
             userObject.characterType = root.characterType || "CHARACTERTYPE_UNKNOWN";
 
+
             if (__positionSource.coordinate) {
                 userObject.location = {
                     "__type" : "GeoPoint",
@@ -69,11 +70,11 @@ Item {
                 } else if (result.errorString === _parse.errorStringUsernameNotDefined
                            || result.errorString === _parse.errorStringUsernameTooShort) {
                     usernameTextField.error = true;
-                    __dialog.showWithMessage("Username must be at least 3 characters in length.")
+                    __dialog.showWithMessage("Username must be at least 4 characters in length.")
                 } else if (result.errorString === _parse.errorStringPasswordNotDefined
                            || result.errorString === _parse.errorStringPasswordTooShort) {
                     passwordTextField.error = true;
-                    __dialog.showWithMessage("Password must be at least 3 characters in length.")
+                    __dialog.showWithMessage("Password must be at least 4 characters in length.")
                 }
                 else {
 
