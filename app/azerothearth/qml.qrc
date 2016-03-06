@@ -54,6 +54,7 @@
         <file>qml/views/Sheet.qml</file>
         <file>qml/views/Slide.qml</file>
         <file>qml/views/BaseTextField.qml</file>
+        <file>qml/Smoke.qml</file>
     </qresource>
     <qresource prefix="/images">
         <file alias="icon">resources/images/uhd-icon.png</file>
