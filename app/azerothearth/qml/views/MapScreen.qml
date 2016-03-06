@@ -2,6 +2,8 @@ import QtQuick 2.0
 import QtPositioning 5.5
 import QtLocation 5.5
 import QtQuick.Controls 1.4
+import QtQuick.Controls.Styles 1.4
+import AzerothEarth 1.0 as AZE
 import "../"
 
 Rectangle {
@@ -83,7 +85,16 @@ Rectangle {
                     _ListModelNearResources.append(model)
             }
         }
+
+        //        for (var i = 0; i < _ListModelResources.count; ++i) {
+        //            var model = _ListModelResources.get(i)
+        //            //            console.log("Checking resource: ", JSON.stringify(model))
+
+        //            console.log(defaultLocation.distanceTo(QtPositioning.coordinate(model.location.latitude, model.location.longitude)))
+        //        }
     }
+
+    color: "#000000"
 
     Component.onCompleted: refresh()
 
@@ -93,7 +104,17 @@ Rectangle {
     Plugin {
         id: _PluginMap
 
-        name: "osm"
+        name: "mapbox"
+
+        PluginParameter {
+            name:  "mapbox.access_token"
+            value: "pk.eyJ1IjoiaWt0d28iLCJhIjoiY2lsZmpxYzV4MXNqYXZhbWM5Y3QyajZldyJ9.C7kwcU6xIzKEB_vvkFT2wg"
+        }
+
+        PluginParameter {
+            name:  "mapbox.map_id"
+            value: "iktwo.7adw8p9p"
+        }
     }
 
     PositionSource {
@@ -119,7 +140,12 @@ Rectangle {
     Map {
         id: _Map
 
-        anchors.fill: parent
+        anchors {
+            top: parent.top
+            left: parent.left
+            right: parent.right
+            bottom: _ColumnContainer.top
+        }
 
         plugin: _PluginMap;
         center: defaultLocation
@@ -206,6 +232,16 @@ Rectangle {
 
                         opacity: 0.8
                     }
+
+                    MouseArea {
+                        anchors.fill: parent
+                        enabled: false
+                        onClicked: {
+                            console.log(Object.keys(root.allocations), root.allocations[model.objectId])
+                            console.log(JSON.stringify(model))
+                            mouse.accepted = false
+                        }
+                    }
                 }
             }
         }
@@ -213,21 +249,67 @@ Rectangle {
         MouseArea {
             anchors.fill: parent
         }
+
+        Button {
+            anchors {
+                right: parent.right; rightMargin: __theme.dp(20)
+                bottom: parent.bottom; bottomMargin: __theme.dp(20)
+            }
+
+            opacity: 0.65
+            width: __theme.dp(110)
+            height: __theme.dp(110)
+
+            style: ButtonStyle {
+                background: Rectangle {
+                    color: "#00000000"
+
+                    border.color: "#ffffff"
+                    border.width: __theme.dp(2)
+                    radius: height
+
+                    Rectangle {
+                        anchors.centerIn: parent
+
+                        height: parent.height * 0.8
+                        width: parent.width * 0.8
+                        color: control.pressed ? Qt.darker("#ffffff") : "#ffffff"
+                        radius: height
+                    }
+                }
+            }
+
+            onClicked: {
+                if (_Map.zoomLevel < 17)
+                    _Map.zoomLevel = 17
+
+                _Map.center = lastPosition
+            }
+
+            z: 9
+        }
     }
 
-    Button {
-        opacity: enabled ? 1 : 0.6
-        enabled: _ListModelNearResources.count > 0
-        width: __theme.dp(140)
-        height: __theme.dp(140)
-        onClicked: _Map.center = lastPosition
+    Rectangle {
+        id: _RectangleStats
+
+        anchors.fill: _ColumnContainer
+
+        color: "#000000"
     }
 
     Column {
+        id: _ColumnContainer
+
         anchors {
-            left: parent.left
-            right: parent.right
+            left: parent.left; leftMargin: __theme.dp(10)
+            right: parent.right; rightMargin: __theme.dp(10)
             bottom: parent.bottom
+        }
+
+        Item {
+            height: __theme.dp(10)
+            width: 1
         }
 
         Button {
@@ -247,13 +329,266 @@ Rectangle {
                 })
             }
         }
+
+        Row {
+            anchors {
+                left: parent.left
+                right: parent.right
+            }
+
+            height: Math.max(_LabelStats.height, _ImageType.height)
+
+            Item {
+                height: 1
+                width: _theme.dp(4)
+            }
+
+            Image {
+                id: _ImageType
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                height: _theme.dp(40)
+                width: _theme.dp(40)
+                source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
+            }
+
+            Item {
+                height: 1
+                width: _theme.dp(4)
+            }
+
+            Smoke {
+                anchors {
+                    verticalCenter: parent.verticalCenter
+                    verticalCenterOffset: __theme.dp(18)
+                }
+
+                height: __theme.dp(60)
+                width: __theme.dp(60)
+            }
+
+            Item {
+                height: 1
+                width: _theme.dp(4)
+            }
+
+            Label {
+                id: _LabelStats
+
+                anchors.verticalCenter: parent.verticalCenter
+
+                color: "#ffffff"
+                font.pixelSize: __theme.dp(60)
+                text: _parse.userObject.resourceTypeGoldCount
+                wrapMode: Text.Wrap
+                maximumLineCount: 2
+                elide: "ElideRight"
+
+                Component.onCompleted: console.log("Userdata:", JSON.stringify(_parse.userObject))
+            }
+
+            Item {
+                height: 1
+                width: __theme.dp(10)
+            }
+
+            Image {
+                width: __theme.dp(120)
+                height: __theme.dp(120)
+                source: "../img/share.png"
+
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: _RectangleDialog.open()
+                }
+            }
+        }
+
+        Item {
+            height: __theme.dp(10)
+            width: 1
+        }
     }
 
-    Button {
-        anchors.centerIn: parent
+    //    Button {
+    //        anchors.centerIn: parent
 
-        width: __theme.dp(140)
-        height: __theme.dp(140)
-        onClicked: refresh()
+    //        width: __theme.dp(140)
+    //        height: __theme.dp(140)
+    //        onClicked: refresh()
+    //    }
+
+    Rectangle {
+        id: _RectangleDialog
+
+        function open() {
+            opacity = 1
+            enabled = 1
+        }
+
+        function close() {
+            opacity = 0
+            enabled = 0
+        }
+
+        anchors.fill: parent
+
+        color: "#88000000"
+        opacity: 0
+        enabled: false
+
+        MouseArea {
+            anchors.fill: parent
+            onClicked: _RectangleDialog.close()
+        }
+
+        Behavior on opacity { NumberAnimation { } }
+
+        onOpacityChanged: {
+            if (opacity >= 1) {
+                console.log("Calling grabToImage")
+                _RectangleDialog.grabToImage(function(result) {
+                    console.log("xxx Saving to file")
+                    result.saveToFile("/sdcard/test.png")
+                    AZE.ImageShare.shareImage()
+                });
+            }
+        }
+
+        Rectangle {
+            id: _RectangleMainStats
+
+            anchors {
+                left: parent.left; leftMargin: parent.width * 0.05
+                right: parent.right; rightMargin: parent.width * 0.05
+                verticalCenter: parent.verticalCenter
+            }
+
+            color: "#000000"
+
+            radius: __theme.dp(22)
+            height: Math.max(_ColumnStatsContent.height + __theme.dp(100), __theme.dp(400))
+
+            Rectangle {
+                anchors.fill: parent
+                radius: parent.radius
+
+                color: "#00000000"
+
+                border {
+                    color: "#f1c40f"
+                    width: __theme.dp(8)
+                }
+            }
+
+            Column {
+                id: _ColumnStatsContent
+
+                anchors {
+                    left: parent.left
+                    right: parent.right
+                }
+
+                Item {
+                    height: __theme.dp(10)
+                    width: 1
+                }
+
+                Image {
+                    width: parent.width
+                    height: width / 2
+                    fillMode: Image.PreserveAspectFit
+                    source: "../img/main-logo-w-slogan.png"
+                }
+
+                Item {
+                    height: __theme.dp(10)
+                    width: 1
+                }
+
+                Label {
+                    width: parent.width
+
+                    horizontalAlignment: "AlignHCenter"
+
+                    color: "#ffffff"
+                    font.pixelSize: __theme.dp(60)
+                    text: _parse.userObject.username
+                    wrapMode: Text.Wrap
+                    maximumLineCount: 2
+                    elide: "ElideRight"
+                }
+
+                Item {
+                    height: __theme.dp(10)
+                    width: 1
+                }
+
+                Row {
+                    anchors {
+                        left: parent.left; leftMargin: __theme.dp(16)
+                        right: parent.right; rightMargin: __theme.dp(16)
+                    }
+
+                    height: _ImageType2.height
+
+                    Item {
+                        height: 1
+                        width: _theme.dp(4)
+                    }
+
+                    Image {
+                        id: _ImageType2
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        height: _theme.dp(180)
+                        width: _theme.dp(180)
+                        source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
+                    }
+
+                    Item {
+                        height: 1
+                        width: _theme.dp(4)
+                    }
+
+                    Smoke {
+                        anchors {
+                            verticalCenter: parent.verticalCenter
+                            verticalCenterOffset: __theme.dp(36)
+                        }
+
+                        height: __theme.dp(80)
+                        width: __theme.dp(80)
+                    }
+
+                    Item {
+                        height: 1
+                        width: _theme.dp(4)
+                    }
+
+                    Label {
+                        id: _LabelStats2
+
+                        anchors.verticalCenter: parent.verticalCenter
+
+                        color: "#ffffff"
+                        font.pixelSize: __theme.dp(60)
+                        text: _parse.userObject.resourceTypeGoldCount
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 2
+                        elide: "ElideRight"
+
+                        Component.onCompleted: console.log("Userdata:", JSON.stringify(_parse.userObject))
+                    }
+
+                    Item {
+                        height: 1
+                        width: __theme.dp(10)
+                    }
+                }
+            }
+        }
     }
 }

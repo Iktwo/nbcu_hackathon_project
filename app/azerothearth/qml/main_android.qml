@@ -38,8 +38,4 @@ Utils.BaseWindow {
         source: "home.qml"
         focus: true
     }
-
-    Component.onCompleted: {
-        // AZE.ImageShare.shareImage()
-    }
 }
