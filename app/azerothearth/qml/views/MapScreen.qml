@@ -11,7 +11,31 @@ Rectangle {
     property variant lastPosition: defaultLocation
 
     ListModel {
+        id: _ListModelClaimed
+    }
+
+    ListModel {
         id: _ListModelNearResources
+    }
+
+    function refresh() {
+        _ListModelPois.clear()
+        _parse.getPois({ }, function(result) {
+            for (var i = 0; i < result.results.length; ++i) {
+                _ListModelPois.append(result.results[i])
+            }
+
+            root.updateClosest()
+        });
+
+        _ListModelResources.clear()
+        _parse.getResourcePois({ }, function(result) {
+            for (var i = 0; i < result.results.length; ++i) {
+                _ListModelResources.append(result.results[i])
+            }
+
+            root.updateClosest()
+        })
     }
 
     function updateClosest() {
@@ -30,9 +54,22 @@ Rectangle {
 
             if (distance <= 50) {
                 _ListModelNearResources.append(model)
+                var claimed = false
+
+                for (var j = 0; j < _ListModelClaimed.count; ++j) {
+                    if (model.objectId === _ListModelClaimed.get(j).objectId) {
+                        claimed = true
+                        break
+                    }
+                }
+
+                if (!claimed)
+                    _ListModelNearResources.append(model)
             }
         }
     }
+
+    Component.onCompleted: refresh()
 
     onDefaultLocationChanged: updateClosest()
     onLastPositionChanged: updateClosest()
@@ -57,31 +94,10 @@ Rectangle {
 
     ListModel {
         id: _ListModelPois
-
-        Component.onCompleted: {
-            _parse.getPois({ }, function(result) {
-                for (var i = 0; i < result.results.length; ++i) {
-                    append(result.results[i])
-                }
-
-                root.updateClosest()
-            });
-        }
     }
 
     ListModel {
         id: _ListModelResources
-
-        Component.onCompleted: {
-            _parse.getResourcePois({ }, function(result) {
-                // console.log(JSON.stringify(result, null, 2))
-                for (var i = 0; i < result.results.length; ++i) {
-                    append(result.results[i])
-                }
-
-                root.updateClosest()
-            })
-        }
     }
 
     Map {
@@ -183,6 +199,14 @@ Rectangle {
         }
     }
 
+    Button {
+        opacity: enabled ? 1 : 0.6
+        enabled: _ListModelNearResources.count > 0
+        width: __theme.dp(140)
+        height: __theme.dp(140)
+        onClicked: _Map.center = lastPosition
+    }
+
     Column {
         anchors {
             left: parent.left
@@ -194,8 +218,25 @@ Rectangle {
             opacity: enabled ? 1 : 0.6
             enabled: _ListModelNearResources.count > 0
             width: parent.width
-            height: __theme.dp(60)
+            height: __theme.dp(140)
             text: qsTr("Grab gold")
+            onClicked: {
+                var model = _ListModelNearResources.get(0)
+                _parse.claimResource(model, function() {
+                    _parse.incrementResourceTypeGoldCount(function() {
+                        _ListModelClaimed.append(model)
+                        _ListModelNearResources.clear()
+                    })
+                })
+            }
         }
+    }
+
+    Button {
+        anchors.centerIn: parent
+
+        width: __theme.dp(140)
+        height: __theme.dp(140)
+        onClicked: refresh()
     }
 }

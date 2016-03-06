@@ -9,10 +9,12 @@ Rectangle {
 
     function close() {
         visible = false;
+        enabled = false
     }
 
     function open() {
         visible = true;
+        enabled = true
     }
 
     ListView {

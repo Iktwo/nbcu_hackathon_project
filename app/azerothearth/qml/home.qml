@@ -164,6 +164,14 @@ Rectangle {
             close();
         }
 
+        z: 3
+    }
+
+    Views.MapScreen {
+        id: _MapScreen
+
+        anchors.fill: parent
+
         z: 2
     }
 
