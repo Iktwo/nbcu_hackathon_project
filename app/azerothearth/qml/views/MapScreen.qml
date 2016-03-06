@@ -34,8 +34,21 @@ Rectangle {
         _ListModelResources.clear()
         _parse.getResourcePois({ }, function(result) {
             for (var i = 0; i < result.results.length; ++i) {
-                allocations[result.results[i].objectId] = result.results[i].allocations
-                _ListModelResources.append(result.results[i])
+                var model = result.results[i]
+                allocations[model.objectId] = model.allocations
+
+                var canAllocate = true
+                var available = 0
+
+                for (var j = 0; j < model.allocations.length; ++j) {
+                    if (model.allocations[j] === _parse.userObject.objectId)
+                        canAllocate = false
+                    else if (model.allocations[j] === "unclaimed")
+                        available += 1
+                }
+
+                if (canAllocate && available > 0)
+                    _ListModelResources.append(model)
             }
 
             root.updateClosest()
