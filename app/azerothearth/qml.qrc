@@ -20,6 +20,7 @@
 		<file>qml/main_ios.qml</file>
 		<file>qml/Parse.qml</file>
 		<file>qml/simfinger.qml</file>
+		<file>qml/Smoke.qml</file>
 		<file>qml/utils/.Model.qml.swp</file>
 		<file>qml/utils/AccentBottom.qml</file>
 		<file>qml/utils/AccentLeft.qml</file>
