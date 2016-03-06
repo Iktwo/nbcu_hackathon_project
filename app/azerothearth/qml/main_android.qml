@@ -37,5 +37,7 @@ Utils.BaseWindow {
 
         source: "home.qml"
         focus: true
+
+        Keys.onBackPressed: { }
     }
 }

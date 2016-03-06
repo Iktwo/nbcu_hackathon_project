@@ -6,7 +6,7 @@ Item {
 
     property int baseSize: height / 10
     property color smokeColor: colors.gold
-    readonly property var colors: { "gold": "#f1c40f", "mineral": "#7f8c8d", "wood": "#d35400", "orc":"#c0392b", "human":"#2980b9"}
+    readonly property var colors: { "gold": "#f1c40f", "mineral": "#7f8c8d", "wood": "#d35400", "orc":"#ab3326", "human":"#1f638f"}
 
     width: 350
     height: 350

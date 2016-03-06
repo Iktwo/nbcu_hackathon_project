@@ -1,10 +1,11 @@
 import QtQuick 2.0
 import QtPositioning 5.5
 import QtLocation 5.5
-import QtQuick.Controls 1.4
+import QtQuick.Controls 1.4 as QC
 import QtQuick.Controls.Styles 1.4
 import AzerothEarth 1.0 as AZE
 import "../"
+import "."
 
 Rectangle {
     id: root
@@ -23,8 +24,8 @@ Rectangle {
     }
 
     function refresh() {
-        _ListModelPois.clear()
         _parse.getPois({ }, function(result) {
+            _ListModelPois.clear()
             for (var i = 0; i < result.results.length; ++i) {
                 _ListModelPois.append(result.results[i])
             }
@@ -32,9 +33,9 @@ Rectangle {
             root.updateClosest()
         });
 
-        allocations = {}
-        _ListModelResources.clear()
         _parse.getResourcePois({ }, function(result) {
+            allocations = {}
+            _ListModelResources.clear()
             for (var i = 0; i < result.results.length; ++i) {
                 var model = result.results[i]
                 allocations[model.objectId] = model.allocations
@@ -161,9 +162,9 @@ Rectangle {
 
             sourceItem: Image {
                 id: _ImageCurrentPosition
-                height: 100
-                width: 100
-                source: "../img/location-orc.png"
+                height: __theme.dp(Math.min(8 * _Map.zoomLevel, 90))
+                width: __theme.dp(Math.min(8 * _Map.zoomLevel, 90))
+                source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/location-orc.png" : "../img/location-human.png"
             }
         }
 
@@ -182,8 +183,8 @@ Rectangle {
 
                         anchors.horizontalCenter: parent.horizontalCenter
 
-                        height: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
-                        width: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
+                        height: __theme.dp(Math.min(35 + (8 * _Map.zoomLevel), 128))
+                        width: __theme.dp(Math.min(35 + (8 * _Map.zoomLevel), 128))
 
                         property int type: Math.round(Math.random() * (1));
 
@@ -211,7 +212,7 @@ Rectangle {
                         text: model.name
 
                         opacity: _Map.zoomLevel >= 15
-                        font.pixelSize: __theme.dp(36)
+                        font.pixelSize: __theme.dp(Math.min(14 + (220 / _Map.zoomLevel), 36))
 
                         color: "#ffffff"
                         styleColor: "#000000"
@@ -219,7 +220,7 @@ Rectangle {
                         wrapMode: Text.Wrap
                         maximumLineCount: 2
                         elide: Text.ElideRight
-                        width: _ItemBase.width * 2
+                        width: _ItemBase.width * 2.5
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignHCenter
 
@@ -241,8 +242,8 @@ Rectangle {
                 sourceItem: Item {
                     id: _ItemContainer
 
-                    height: __theme.dp(Math.min(9 * _Map.zoomLevel, 97))
-                    width: __theme.dp(Math.min(9 * _Map.zoomLevel, 97))
+                    height: __theme.dp(Math.min(15 + (4 * _Map.zoomLevel), 97))
+                    width: __theme.dp(Math.min(15 + (4 * _Map.zoomLevel), 97))
 
                     Smoke {
                         id: _Smoke
@@ -269,7 +270,7 @@ Rectangle {
             anchors.fill: parent
         }
 
-        Button {
+        QC.Button {
             anchors {
                 right: parent.right; rightMargin: __theme.dp(20)
                 bottom: parent.bottom; bottomMargin: __theme.dp(20)
@@ -331,7 +332,7 @@ Rectangle {
             width: 1
         }
 
-        Button {
+        BaseButton {
             opacity: enabled ? 1 : 0.6
             enabled: _ListModelNearResources.count > 0
             width: parent.width
@@ -344,9 +345,16 @@ Rectangle {
                     _parse.incrementResourceTypeGoldCount(function() {
                         _ListModelClaimed.append(model)
                         _ListModelNearResources.clear()
+                        _parse.refreshUserInformation()
+                        root.refresh()
                     })
                 })
             }
+        }
+
+        Item {
+            height: __theme.dp(20)
+            width: 1
         }
 
         Row {
@@ -367,8 +375,8 @@ Rectangle {
 
                 anchors.verticalCenter: parent.verticalCenter
 
-                height: __theme.dp(40)
-                width: __theme.dp(40)
+                height: __theme.dp(80)
+                width: __theme.dp(80)
                 source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
             }
 
@@ -383,8 +391,8 @@ Rectangle {
                     verticalCenterOffset: __theme.dp(18)
                 }
 
-                height: __theme.dp(60)
-                width: __theme.dp(60)
+                height: __theme.dp(40)
+                width: __theme.dp(40)
             }
 
             Item {
@@ -409,21 +417,29 @@ Rectangle {
 
             Item {
                 height: 1
-                width: __theme.dp(10)
+                width: parent.parent.width - x - _ImageShare.width - __theme.dp(10)
             }
 
-            Image {
+            Item {
+                id: _ImageShare
+
                 anchors.verticalCenter: parent.verticalCenter
 
-                width: __theme.dp(120)
-                height: __theme.dp(120)
-                source: "../img/share.png"
+                width: parent.height
+                height: parent.height
+
+                Image {
+                    anchors.fill: parent
+                    anchors.margins: height * 0.05
+                    source: "../img/share.png"
+                }
 
                 MouseArea {
                     anchors.fill: parent
                     onClicked: _RectangleDialog.open()
                 }
             }
+
         }
 
         Item {
