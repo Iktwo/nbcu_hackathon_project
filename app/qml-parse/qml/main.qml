@@ -62,8 +62,11 @@ Window {
                         var o = {
                             "id" : venue.id,
                             "name" : venue.name,
-                            "lat" : venue.location.lat,
-                            "lng" : venue.location.lng
+                            "location" : {
+                                "__type" : "GeoPoint",
+                                "latitude" : venue.location.lat,
+                                "longitude" : venue.location.lng
+                            }
                         }
                         _parse.postPoi(o);
                     }
@@ -93,8 +96,11 @@ Window {
                         var o = {
                             "id" : venue.id,
                             "name" : venue.name,
-                            "lat" : venue.location.lat,
-                            "lng" : venue.location.lng,
+                            "location" : {
+                                "__type" : "GeoPoint",
+                                "latitude" : venue.location.lat,
+                                "longitude" : venue.location.lng
+                            },
                             "type" : "RESOURCETYPE_GOLD",
                             "allocations" : arr
                         }

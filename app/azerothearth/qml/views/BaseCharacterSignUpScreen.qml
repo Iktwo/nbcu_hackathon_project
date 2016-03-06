@@ -31,8 +31,11 @@ Item {
             userObject.characterType = root.characterType || "CHARACTERTYPE_UNKNOWN";
 
             if (__positionSource.coordinate) {
-                userObject.lat = __positionSource.coordinate.latitude
-                userObject.lng = __positionSource.coordinate.longitude
+                userObject.location = {
+                    "__type" : "GeoPoint",
+                    "latitude" : __positionSource.coordinate.latitude,
+                    "longitude" : __positionSource.coordinate.longitude
+                }
             }
 
             _parse.registerUser(userObject, function(result) {
