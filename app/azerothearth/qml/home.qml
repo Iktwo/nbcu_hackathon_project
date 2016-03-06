@@ -131,7 +131,7 @@ Rectangle {
         z: 1
     }
 
-    Views.PickRaceScreen {
+    Views.SplashScreen {
         anchors.fill: parent
 
         onClose: {
