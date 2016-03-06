@@ -119,7 +119,6 @@ Rectangle {
     FontLoader { id: fontLI }
     FontLoader { id: font }
 
-
     Item {
         id: _Item_PageContainer
         anchors.top: parent.top

@@ -143,6 +143,8 @@ Item {
         console.log("attempting to register user:");
         console.log(JSON.stringify(userObject, null, 2));
 
+        userObject.username = userObject.username.toLowerCase();
+
         internal.post(urlUsers, userObject, function(result, error) {
             var errorString = "";
             if (error) {
@@ -179,6 +181,8 @@ Item {
             "username": username,
             "password": password
         }
+
+        o.username = o.username.toLowerCase();
 
         internal.get(urlUserLogin, o, function(result, error) {
             var errorString = "";
