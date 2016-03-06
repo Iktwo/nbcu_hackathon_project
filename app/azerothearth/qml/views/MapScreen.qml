@@ -17,19 +17,20 @@ Rectangle {
     PositionSource {
         id: _PositionSource
 
-        property variant lastSearchPosition: defaultLocation
+        property variant lastPosition: defaultLocation
 
         active: true
-        updateInterval: 120000 // 2 mins
+        updateInterval: 15000
         onPositionChanged:  {
             var currentPosition = _PositionSource.position.coordinate
-            _Map.center = currentPosition
-            var distance = currentPosition.distanceTo(lastSearchPosition)
+            _MapQuickItemCurrentPosition.coordinate = currentPosition
+            // _Map.center = currentPosition
+            var distance = currentPosition.distanceTo(lastPosition)
             if (distance > 500) {
                 // 500m from last performed search
-                lastSearchPosition = currentPosition
-                searchModel.searchArea = QtPositioning.circle(currentPosition)
-                searchModel.update()
+                lastPosition = currentPosition
+                // searchModel.searchArea = QtPositioning.circle(currentPosition)
+                // searchModel.update()
             }
         }
     }
@@ -55,6 +56,22 @@ Rectangle {
         plugin: _PluginMap;
         center: defaultLocation
         zoomLevel: 13
+
+        MapQuickItem {
+            id: _MapQuickItemCurrentPosition
+
+            coordinate: _PositionSource.lastPosition
+
+            anchorPoint.x: _RectangleCurrentPosition.width * 0.5
+            anchorPoint.y: _RectangleCurrentPosition.height
+
+            sourceItem: Rectangle {
+                id: _RectangleCurrentPosition
+                height: 100
+                width: 100
+                color: "#443498db"
+            }
+        }
 
         MapItemView {
             model: _ListModelPois
