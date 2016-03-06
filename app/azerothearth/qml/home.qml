@@ -13,7 +13,7 @@ Rectangle {
 
     property bool isScreenPortrait: height >= width
 
-    color: "#ffffff"
+    color: "#000000"
     width:  parent.width
     height: parent.height
     focus: true
@@ -108,7 +108,7 @@ Rectangle {
                 name: "ios"
                 PropertyChanges {
                     target: __theme;
-//                    fontFamily: "Avenir Next"
+                    //                    fontFamily: "Avenir Next"
                 }
             },
             State {

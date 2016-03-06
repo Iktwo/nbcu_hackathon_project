@@ -305,34 +305,6 @@ Item {
         // Give the user 1 resourceTypeGold
         userObject.resourceTypeGoldCount = 1;
 
-        internal.post(url2UserCreate, user2Object, function (res, err){
-            var errorString = "";
-
-            if (err) {
-                if (result.code === 202) {
-                    errorString = root.errorStringUsernameTaken;
-                }
-                callback({
-                             status: 0,
-                             result: result,
-                             errorString: errorString
-                         });
-            } else {
-                try {
-                    internal.sessionToken = result.sessionToken;
-                } catch (ex) {
-                    console.warn("user signed in successfully but no session token not found");
-                }
-                callback({
-                             status: 1,
-                             result: result,
-                             errorString: errorString
-                         });
-            }
-        });
-
-
-
         internal.post(urlUsers, userObject, function(result, error) {
             var errorString = "";
             if (error) {
@@ -356,6 +328,9 @@ Item {
                              errorString: errorString
                          });
             }
+
+            internal.post(url2UserCreate, user2Object, function (res, err){  });
+            root.refreshUserInformation();
 
         });
     }
