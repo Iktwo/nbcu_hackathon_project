@@ -8,12 +8,6 @@ Rectangle {
 
     property variant defaultLocation: QtPositioning.coordinate(37.78, -122.41)
 
-    property variant pois: [
-        {lat: 37.78, lng: -122.42, name: "Test 1"},
-        {lat: 37.72, lng: -122.41, name: "Test 2"},
-        {lat: 37.74, lng: -122.40, name: "Test 3"}
-    ]
-
     Plugin {
         id: _PluginMap
 
@@ -44,9 +38,12 @@ Rectangle {
         id: _ListModelPois
 
         Component.onCompleted: {
-            for (var i = 0; i < root.pois.length; ++i) {
-                append(root.pois[i])
-            }
+            _parse.getPois({ }, function(result) {
+                console.log(JSON.stringify(result))
+                for (var i = 0; i < result.results.length; ++i) {
+                    append(result.results[i])
+                }
+            });
         }
     }
 
@@ -71,17 +68,39 @@ Rectangle {
                 sourceItem: Column {
                     Image {
                         id: _Image
-                        source: "images/orc_marker.png"
+
+                        anchors.horizontalCenter: parent.horizontalCenter
+
+                        source: "../img/marker-orc.png"
                         fillMode: Image.PreserveAspectFit
-                        height: 64
-                        width: 64
+                        height: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
+                        width: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
                     }
 
-                    Text {
-                        text: model.name; font.bold: true
+                    Label {
+                        text: model.name
+
+                        opacity: _Map.zoomLevel >= 15
+                        font.pixelSize: __theme.dp(36)
+
+                        color: "#ffffff"
+                        styleColor: "#000000"
+                        style: Text.Outline
+                        wrapMode: Text.Wrap
+                        maximumLineCount: 2
+                        elide: Text.ElideRight
+                        width: _Image.width * 2
+                        horizontalAlignment: Text.AlignHCenter
+                        verticalAlignment: Text.AlignHCenter
+
+                        Behavior on opacity { NumberAnimation { } }
                     }
                 }
             }
+        }
+
+        MouseArea {
+            anchors.fill: parent
         }
     }
 }

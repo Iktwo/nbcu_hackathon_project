@@ -37,13 +37,9 @@ Utils.BaseWindow {
 
         source: "home.qml"
         focus: true
-
-        onLoaded: {
-            item.header.height = Math.ceil(DD14.ScreenValues.dp * (DD14.ScreenValues.isTablet ? 56 : (isScreenPortrait ? 48 : 40)))
-        }
     }
 
     Component.onCompleted: {
-        AZE.ImageShare.shareImage()
+        // AZE.ImageShare.shareImage()
     }
 }
