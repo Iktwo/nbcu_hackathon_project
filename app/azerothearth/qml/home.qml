@@ -1,4 +1,5 @@
 import QtQuick 2.3
+import QtGraphicalEffects 1.0 as QGE
 import QtPositioning 5.5
 import QtLocation 5.5
 
@@ -9,26 +10,6 @@ import AzerothEarth 1.0 as AZE
 
 Rectangle {
     id: root
-
-    Rectangle {
-        // TODO: ND - Remove this redsquare
-        width: 100
-        height: 100
-        color: "red"
-        opacity: 0.25
-        anchors.top: parent.top
-        anchors.right: parent.right
-        MouseArea {
-            anchors.fill: parent
-            onClicked: {
-                console.log("## LOGOUT");
-                _parse.logoutUser();
-                _splashScreen.reset();
-                _splashScreen.open();
-            }
-        }
-        z: 100000000000
-    }
 
     property bool isScreenPortrait: height >= width
 
@@ -184,6 +165,45 @@ Rectangle {
         anchors.fill: parent
         source: "views/MapScreen.qml"
         active: _parse.userObject !== null
+
+        Connections {
+            target: _parse
+        }
+
+        z: 2
+    }
+
+    Rectangle {
+        // TODO: ND - Remove this redsquare
+        width: 100
+        height: 100
+        color: "transparent"
+        anchors.top: parent.top
+        anchors.right: parent.right
+        opacity: _mouseAreaLogout.pressed ? 1.0 : 0.45
+        MouseArea {
+            id: _mouseAreaLogout
+            anchors.fill: parent
+            onClicked: {
+                console.log("## LOGOUT");
+                _parse.logoutUser();
+                _splashScreen.reset();
+                _splashScreen.open();
+            }
+        }
+
+        Image {
+            anchors.fill: parent
+            anchors.margins: __theme.dp(20)
+            fillMode: Image.PreserveAspectFit
+            source: "img/icon-logout.png"
+
+            layer.enabled: true
+            layer.effect: QGE.ColorOverlay {
+                color: "#FFFFFF"
+            }
+        }
+
         z: 2
     }
 

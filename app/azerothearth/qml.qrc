@@ -10,6 +10,8 @@
 		<file>qml/img/character-both.jpg</file>
 		<file>qml/img/character-human.jpg</file>
 		<file>qml/img/character-orc.jpg</file>
+		<file>qml/img/icon-gps.png</file>
+		<file>qml/img/icon-logout.png</file>
 		<file>qml/img/landscape-azerothearth.jpg</file>
 		<file>qml/img/location-human.png</file>
 		<file>qml/img/location-orc.png</file>

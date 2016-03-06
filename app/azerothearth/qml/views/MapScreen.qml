@@ -1,4 +1,5 @@
 import QtQuick 2.0
+import QtGraphicalEffects 1.0 as QGE
 import QtPositioning 5.5
 import QtLocation 5.5
 import QtQuick.Controls 1.4 as QC
@@ -172,11 +173,66 @@ Rectangle {
             anchorPoint.x: _ImageCurrentPosition.width * 0.5
             anchorPoint.y: _ImageCurrentPosition.height * 0.5
 
-            sourceItem: Image {
-                id: _ImageCurrentPosition
-                height: __theme.dp(Math.min(8 * _Map.zoomLevel, 90))
-                width: __theme.dp(Math.min(8 * _Map.zoomLevel, 90))
-                source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/location-orc.png" : "../img/location-human.png"
+            sourceItem: Item {
+                width: _ImageCurrentPosition.width
+                height: _ImageCurrentPosition.height
+
+                Rectangle {
+                    id: _rectangleCurrentLocation2
+                    width: parent.width
+                    height: width
+                    anchors.centerIn: parent
+                    opacity: 0.25
+
+                    radius: width / 2
+
+                    color: _rectangleCurrentLocation.color
+                }
+                Rectangle {
+                    id: _rectangleCurrentLocation
+                    width: parent.width
+                    height: width
+                    anchors.centerIn: parent
+
+                    radius: width / 2
+
+                    color: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ?
+                               "#ef492f"
+                             : "#387ee5"
+
+                    SequentialAnimation {
+                        running: true
+                        loops: Animation.Infinite
+
+                        ParallelAnimation {
+                            NumberAnimation {
+                                target: _rectangleCurrentLocation
+                                property: "width"
+                                from: _rectangleCurrentLocation.parent.width/2
+                                to: 2*_rectangleCurrentLocation.width
+
+                                duration: 3000
+                                easing.type: Easing.OutCubic
+                            }
+                            NumberAnimation {
+                                target: _rectangleCurrentLocation
+                                property: "opacity"
+                                from: 0.70
+                                to: 0.0
+
+                                duration: 2000
+                                easing.type: Easing.OutCubic
+                            }
+                        }
+                    }
+                }
+
+                Image {
+                    id: _ImageCurrentPosition
+                    height: __theme.dp(Math.min(8 * _Map.zoomLevel, 90))
+                    width: __theme.dp(Math.min(8 * _Map.zoomLevel, 90))
+                    source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
+                }
             }
         }
 
@@ -307,40 +363,33 @@ Rectangle {
             anchors.fill: parent
         }
 
-        QC.Button {
+        MouseArea {
             anchors {
-                right: parent.right; rightMargin: __theme.dp(20)
-                bottom: parent.bottom; bottomMargin: __theme.dp(20)
+                right: parent.right;
+                bottom: parent.bottom;
             }
 
-            opacity: 0.65
-            width: __theme.dp(110)
-            height: __theme.dp(110)
-
-            style: ButtonStyle {
-                background: Rectangle {
-                    color: "#00000000"
-
-                    border.color: "#ffffff"
-                    border.width: __theme.dp(2)
-                    radius: height
-
-                    Rectangle {
-                        anchors.centerIn: parent
-
-                        height: parent.height * 0.8
-                        width: parent.width * 0.8
-                        color: control.pressed ? Qt.darker("#ffffff") : "#ffffff"
-                        radius: height
-                    }
-                }
-            }
 
             onClicked: {
                 if (_Map.zoomLevel < 17)
                     _Map.zoomLevel = 17
 
                 _Map.center = lastPosition
+            }
+            opacity: pressed ? 1.0 : 0.65
+            width: __theme.dp(110)
+            height: __theme.dp(110)
+
+            Image {
+                anchors.fill: parent
+                anchors.margins: __theme.dp(20)
+                fillMode: Image.PreserveAspectFit
+                source: "../img/icon-gps.png"
+
+                layer.enabled: true
+                layer.effect: QGE.ColorOverlay {
+                    color: "#FFFFFF"
+                }
             }
 
             z: 9
@@ -370,7 +419,7 @@ Rectangle {
         }
 
         BaseButton {
-            opacity: enabled ? 1 : 0.6
+            opacity: enabled ? 1 : 0.45
             enabled: _ListModelNearResources.count > 0
             width: parent.width
             height: __theme.dp(140)
