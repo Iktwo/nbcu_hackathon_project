@@ -4,86 +4,39 @@ import QtQuick.Particles 2.0
 Item {
     id: root
 
-    width: 320
-    height: 480
+    property int baseSize: height / 10
+    property color smokeColor: colors.gold
+    readonly property var colors: { "gold": "#f1c40f", "mineral": "#7f8c8d", "wood": "#d35400"}
+
+    width: 350
+    height: 350
 
     ParticleSystem {
         anchors.fill: parent
 
-        Turbulence {
-            anchors.fill: parent
-            enabled: true
-            height: (parent.height / 2) - 4
-            width: parent.width
-            x: parent. width / 4
-            strength: 32
-
-            NumberAnimation on strength{ from: 16; to: 64; easing.type: Easing.InOutBounce; duration: 1800; loops: -1 }
-        }
-
-        ImageParticle {
-            groups: ["smoke"]
-            source: "qrc:///particleresources/glowdot.png"
-            color: "#11111111"
-            colorVariation: 0
-        }
-
-        ImageParticle {
-            groups: ["flame"]
-            source: "qrc:///particleresources/glowdot.png"
-            color: "#11ff400f"
-            colorVariation: 0.1
-        }
-
         Emitter {
-            id: flame
+            id: _Emitter
 
-            property int area: 90
+            property int area: root.width
 
             anchors.centerIn: parent
-            group: "flame"
+            group: "B"
 
-            emitRate: 120
-            lifeSpan: 1200
-            size: area
+            emitRate: 100
+            lifeSpan: 1500
+            size: area * 0.4
             endSize: area / 6
             sizeVariation: area / 2
-            acceleration: PointDirection { y: -40 }
-            velocity: AngleDirection { angle: 270; magnitude: flame.area / 2; angleVariation: 22; magnitudeVariation: flame.area / 12 }
+            acceleration: PointDirection { y: -baseSize }
+            velocity: AngleDirection { angle: 270; magnitude: _Emitter.area / 2; angleVariation: baseSize * 1.4; magnitudeVariation: _Emitter.area / 12 }
         }
 
-        TrailEmitter {
-            id: smoke1
-
-            width: root.width
-            height: root.height/2
-            group: "smoke"
-            follow: "flame"
-
-            emitRatePerParticle: 1
-            lifeSpan: 2400
-            lifeSpanVariation: 400
-            size: flame.area / 3
-            endSize: flame.area / 6
-            sizeVariation: flame.area / 5
-            acceleration: PointDirection { y: -40 }
-            velocity: AngleDirection { angle: 270; magnitude: flame.area / 2; angleVariation: 22; magnitudeVariation: magnitude / 4 }
-        }
-
-        TrailEmitter {
-            id: smoke2
-            width: root.width
-            height: root.height/2 - 20
-            group: "smoke"
-            follow: "flame"
-
-            emitRatePerParticle: 4
-            lifeSpan: 2400
-            size: flame.area / 1.5
-            endSize: flame.area / 1.8
-            sizeVariation: 12
-            acceleration: PointDirection { y: -40 }
-            velocity: AngleDirection { angle: 270; magnitude: flame.area / 2; angleVariation: 22; magnitudeVariation: magnitude / 4 }
+        ImageParticle {
+            groups: ["B"]
+            anchors.fill: parent
+            source: "qrc:///particleresources/star.png"
+            color: root.smokeColor
+            colorVariation: 0.15
         }
     }
 }
