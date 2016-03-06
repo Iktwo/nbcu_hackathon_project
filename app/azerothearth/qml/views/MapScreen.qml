@@ -173,20 +173,39 @@ Rectangle {
             delegate: MapQuickItem {
                 coordinate: QtPositioning.coordinate(model.location.latitude, model.location.longitude)
 
-                anchorPoint.x: _Image.width * 0.5
-                anchorPoint.y: _Image.height * 0.5
+                anchorPoint.x: _ItemBase.width * 0.5
+                anchorPoint.y: _ItemBase.height * 0.5
 
                 sourceItem: Column {
-                    Image {
-                        id: _Image
+                    Item {
+                        id: _ItemBase
 
                         anchors.horizontalCenter: parent.horizontalCenter
 
-                        source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
-                        fillMode: Image.PreserveAspectFit
                         height: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
                         width: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
+
+                        property int type: Math.round(Math.random() * (1));
+
+                        Smoke {
+                            anchors.fill: parent
+
+                            smokeColor: parent.type === 1 ? colors.orc : colors.human
+                            opacity: 0.8
+                        }
+
+                        Image {
+                            id: _Image
+
+                            anchors.fill: parent
+                            anchors.margins: parent.height * 0.05
+
+                            source: parent.type === 1 ? "../img/marker-orc.png" : "../img/marker-human.png"
+                            fillMode: Image.PreserveAspectFit
+                            z: 9
+                        }
                     }
+
 
                     Label {
                         text: model.name
@@ -200,7 +219,7 @@ Rectangle {
                         wrapMode: Text.Wrap
                         maximumLineCount: 2
                         elide: Text.ElideRight
-                        width: _Image.width * 2
+                        width: _ItemBase.width * 2
                         horizontalAlignment: Text.AlignHCenter
                         verticalAlignment: Text.AlignHCenter
 
@@ -394,6 +413,8 @@ Rectangle {
             }
 
             Image {
+                anchors.verticalCenter: parent.verticalCenter
+
                 width: __theme.dp(120)
                 height: __theme.dp(120)
                 source: "../img/share.png"
@@ -445,14 +466,19 @@ Rectangle {
 
         Behavior on opacity { NumberAnimation { } }
 
-        onOpacityChanged: {
-            if (opacity >= 1) {
-                console.log("Calling grabToImage")
+        BaseButton {
+            anchors {
+                top: _RectangleMainStats.bottom; topMargin: __theme.dp(40)
+                horizontalCenter: _RectangleMainStats.horizontalCenter
+            }
+
+            width: _RectangleMainStats.width * 0.5
+            text: "Share"
+            onClicked: {
                 _RectangleDialog.grabToImage(function(result) {
-                    console.log("xxx Saving to file")
                     result.saveToFile("/sdcard/test.png")
                     AZE.ImageShare.shareImage()
-                });
+                })
             }
         }
 
@@ -462,7 +488,7 @@ Rectangle {
             anchors {
                 left: parent.left; leftMargin: parent.width * 0.05
                 right: parent.right; rightMargin: parent.width * 0.05
-                verticalCenter: parent.verticalCenter
+                top: parent.top; topMargin: __theme.dp(200)
             }
 
             color: "#000000"
