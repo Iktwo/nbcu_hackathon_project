@@ -157,9 +157,14 @@ Item {
                     console.log("### START RESPONSE");
                     console.log(xhr.responseText);
                     console.log("### END RESPONSE");
-                    var result = JSON.parse(xhr.responseText);
+                    var result = { }
+                    try {
+                        result = JSON.parse(xhr.responseText);
+                    } catch (ex) {
+                        result = { result: { message: xhr.responseText } }
+                    }
                     if (callback) {
-                        callback(result);
+                        callback(result, false);
                     } else {
                         console.warn("callback not found");
                     }
@@ -259,6 +264,7 @@ Item {
                     var result = JSON.parse(xhr.responseText);
 
                     internal.sessionToken = "";
+                    root.userObject = null;
                 }
             }
 
@@ -301,7 +307,8 @@ Item {
 
         internal.post(url2UserCreate, user2Object, function (res, err){
             var errorString = "";
-            if (error) {
+
+            if (err) {
                 if (result.code === 202) {
                     errorString = root.errorStringUsernameTaken;
                 }
