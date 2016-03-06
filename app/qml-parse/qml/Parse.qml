@@ -1,6 +1,6 @@
 import QtQuick 2.4
 
-import api 1.0
+import Qt.labs.settings 1.0
 
 Item {
     id: root
@@ -14,13 +14,22 @@ Item {
     property string urlUserLogin: urlBase + "login/"
 
     property string classNamePoi: "poi"
+    property string classNameResource: "resource"
 
     property string appId: "UPJFfR8GO7kXYFPicuKK0mdakfcL73vU4PwzsiV9"
     property string apiKey: "lUbm8jUTe7efq4dbgzV88bMoZ1G2kE1TPDB6V0Sk"
 
+    property string errorStringUsernameTaken: "USERNAME_ALREADY_TAKEN"
+    property string errorStringUsernameNotDefined: "USERNAME_NOT_DEFINED"
+    property string errorStringPasswordNotDefined: "PASSWORD_NOT_DEFINED"
+    property string errorStringUsernameTooShort: "USERNAME_TOO_SHORT"
+    property string errorStringPasswordTooShort: "PASSWORD_TOO_SHORT"
+    property string errorStringPasswordIncorrect: "PASSWORD_INCORRECT"
+
+
     function foursquare_scrapeMonuments(callback) {
         var xhr = new XMLHttpRequest();
-        xhr.open("GET", foursquare.urlVenues, true);
+        xhr.open("GET", foursquare.urlVenues_Monuments, true);
         xhr.setRequestHeader("Content-Type", "application/json");
 
         xhr.onreadystatechange = function() {
@@ -35,6 +44,44 @@ Item {
         xhr.send();
     }
 
+    function foursquare_scrapeVenuesForResources(callback) {
+        var xhr = new XMLHttpRequest();
+        console.log("scrapeVenuesForResources url:", foursquare.urlVenuesShopsServices)
+        xhr.open("GET", foursquare.urlVenuesShopsServices, true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4) {
+                var result = JSON.parse(xhr.responseText);
+                if (callback) {
+                    callback(result);
+                }
+            }
+        }
+
+        xhr.send();
+    }
+
+    Settings {
+        id: _settings
+
+        property string sessionToken
+
+        Component.onCompleted: {
+            console.log("QSettings completed:", sessionToken);
+            if (sessionToken) {
+                internal.validateSession(sessionToken);
+            }
+        }
+    }
+
+    Connections {
+        target: internal
+        onSessionTokenChanged: {
+            _settings.sessionToken = internal.sessionToken;
+        }
+    }
+
     QtObject {
         id: foursquare
 
@@ -42,7 +89,8 @@ Item {
         property string clientSecret: "TEQGO515PTXVXHRIFNAKGWFYSLHRYPKZIX5VGTPSLJ5KTNWC"
 
         property string urlSuffix: "&client_id=" + clientId + "&client_secret=" + clientSecret + "&v=20160305"
-        property string urlVenues: "https://api.foursquare.com/v2/venues/search/?ll=37.773972,-122.431297&categoryId=4bf58dd8d48988d12d941735" + urlSuffix
+        property string urlVenues_Monuments: "https://api.foursquare.com/v2/venues/search/?limit=50&ll=37.773972,-122.431297&categoryId=4bf58dd8d48988d12d941735" + urlSuffix
+        property string urlVenuesShopsServices: "https://api.foursquare.com/v2/venues/search/?limit=50&ll=37.773972,-122.431297&categoryId=4d4b7105d754a06378d81259" + urlSuffix
     }
 
     QtObject {
@@ -112,34 +160,87 @@ Item {
         function getClass(className, obj, callback) {
             get(urlClasses + className, obj, callback);
         }
+
+        function validateSession(sessionToken) {
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("GET", "https://api.parse.com/1/users/me", true);
+            xhr.setRequestHeader("X-Parse-Application-Id", root.appId);
+            xhr.setRequestHeader("X-Parse-REST-API-Key", root.apiKey);
+            xhr.setRequestHeader("X-Parse-Session-Token", sessionToken);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    var result = JSON.parse(xhr.responseText);
+                    var error = true;
+                    if (result.objectId) {
+                        error = false;
+                    }
+
+                    if (!error) {
+                        internal.sessionToken = sessionToken;
+                    }
+                }
+            }
+
+            xhr.send();
+        }
+
+        function logout() {
+            var xhr = new XMLHttpRequest();
+
+            xhr.open("GET", "https://api.parse.com/1/users/me", true);
+            xhr.setRequestHeader("X-Parse-Application-Id", root.appId);
+            xhr.setRequestHeader("X-Parse-REST-API-Key", root.apiKey);
+            xhr.setRequestHeader("X-Parse-Session-Token", internal.sessionToken);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4) {
+                    var result = JSON.parse(xhr.responseText);
+
+                    internal.sessionToken = "";
+                }
+            }
+
+            xhr.send();
+        }
+
     }
+
 
     function registerUser(userObject, callback) {
         if (!userObject.username) {
-            callback({ status: 0, errorString: "USERNAME_NOT_DEFINED" });
+            callback({ status: 0, errorString: root.errorStringUsernameNotDefined });
             return;
         }
 
         if (!userObject.password) {
-            callback({ status: 0, errorString: "PASSWORD_NOT_DEFINED" });
+            callback({ status: 0, errorString: root.errorStringPasswordNotDefined });
             return;
         }
 
         if (userObject.username.length < 3) {
-            callback({ status: 0, errorString: "USERNAME_TOO_SHORT" });
+            callback({ status: 0, errorString: root.errorStringUsernameTooShort });
             return;
         }
 
         if (userObject.password.length < 3) {
-            callback({ status: 0, errorString: "PASSWORD_TOO_SHORT" });
+            callback({ status: 0, errorString: root.errorStringPasswordTooShort });
             return;
         }
+
+        console.log("attempting to register user:");
+        console.log(JSON.stringify(userObject, null, 2));
+
+        userObject.username = userObject.username.toLowerCase();
 
         internal.post(urlUsers, userObject, function(result, error) {
             var errorString = "";
             if (error) {
                 if (result.code == 202) {
-                    errorString = "USERNAME_ALREADY_TAKEN";
+                    errorString = root.errorStringUsernameTaken;
                 }
                 callback({
                              status: 0,
@@ -147,6 +248,11 @@ Item {
                              errorString: errorString
                          });
             } else {
+                try {
+                    internal.sessionToken = result.sessionToken;
+                } catch (ex) {
+                    console.warn("user signed in successfully but no session token not found");
+                }
                 callback({
                              status: 1,
                              result: result,
@@ -172,11 +278,13 @@ Item {
             "password": password
         }
 
+        o.username = o.username.toLowerCase();
+
         internal.get(urlUserLogin, o, function(result, error) {
             var errorString = "";
             if (error) {
                 if (result.code == 201 || result.code == 101) {
-                    errorString = "PASSWORD_INCORRECT";
+                    errorString = root.errorStringPasswordIncorrect;
                 }
                 callback({
                              status: 0,
@@ -199,6 +307,10 @@ Item {
         });
     }
 
+    function logoutUser() {
+        internal.logout();
+    }
+
     function buildUserObject(username, password) {
         return { username: username, password: password };
     }
@@ -213,6 +325,18 @@ Item {
         internal.postClass(classNamePoi, poi, function(result, error) {
             console.log("result.objectId", result.objectId);
         });
+    }
+
+    // Post a resource POI
+    function postResourcePoi(poi) {
+        internal.postClass(classNameResource, poi, function(result, error) {
+            console.log("result.objectId", result.objectId);
+        });
+    }
+
+    // Get a list of Resource POIs
+    function getResourcePois(obj, callback) {
+        internal.getClass(classNameResource, obj || { }, callback);
     }
 }
 

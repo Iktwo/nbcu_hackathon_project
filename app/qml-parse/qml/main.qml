@@ -71,6 +71,40 @@ Window {
             }
         }
         Controls.Button {
+            text: "scrape POIs for resources"
+            onClicked: {
+                _parse.foursquare_scrapeVenuesForResources(function(result) {
+                    console.log(result.response.venues.length);
+
+                    function randomIntFromInterval(min,max)
+                    {
+                        return Math.floor(Math.random()*(max-min+1)+min);
+                    }
+
+                    for (var i = 0; i < result.response.venues.length; i++) {
+                        var venue = result.response.venues[i];
+
+
+                        var arr = [];
+                        for (var j = 0; j < randomIntFromInterval(3, 6); j++) {
+                            arr.push("unclaimed");
+                        }
+
+                        var o = {
+                            "id" : venue.id,
+                            "name" : venue.name,
+                            "lat" : venue.location.lat,
+                            "lng" : venue.location.lng,
+                            "type" : "RESOURCETYPE_GOLD",
+                            "allocations" : arr
+                        }
+
+                        _parse.postResourcePoi(o);
+                    }
+                });
+            }
+        }
+        Controls.Button {
             text: "post User object"
             onClicked: {
                 var userObject = _parse.buildUserObject("test"+Math.floor(Math.random()*1000), "test123");
@@ -102,6 +136,14 @@ Window {
             text: "get POI"
             onClicked: {
                 _parse.getPois({ }, function(result) {
+                    console.log(JSON.stringify(result, null, 2))
+                });
+            }
+        }
+        Controls.Button {
+            text: "get resource POI"
+            onClicked: {
+                _parse.getResourcePois({ }, function(result) {
                     console.log(JSON.stringify(result, null, 2))
                 });
             }

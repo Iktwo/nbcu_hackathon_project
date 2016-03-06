@@ -49,7 +49,10 @@ Item {
                     __dialog.showWithMessage("Password must be at least 3 characters in length.")
                 }
                 else {
-                    root.registrationSuccessful(_textFieldUsername.text);
+
+                    var characterMessage = root.characterType === "CHARACTERTYPE_ORC" ? "Orc Army" : "Human Collective"
+                    __dialog.showWithMessage("Hello, " + usernameTextField.text + ".\nWelcome to the " + characterMessage);
+                    root.registrationSuccessful(usernameTextField.text);
                 }
             });
         }

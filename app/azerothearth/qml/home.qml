@@ -10,6 +10,24 @@ import AzerothEarth 1.0 as AZE
 Rectangle {
     id: root
 
+    Rectangle {
+        // TODO: ND - Remove this redsquare
+        width: 100
+        height: 100
+        color: "red"
+        opacity: 0.25
+        anchors.centerIn: parent
+        MouseArea {
+            anchors.fill: parent
+            onClicked: {
+                console.log("## LOGOUT");
+                _parse.logoutUser();
+                _splashScreen.open();
+            }
+        }
+        z: 100000000000
+    }
+
     property bool isScreenPortrait: height >= width
 
     color: "#ffffff"
@@ -19,6 +37,12 @@ Rectangle {
 
     Parse {
         id: _parse
+
+        onIsUserAuthenticatedChanged: {
+            if (isUserAuthenticated) {
+                _splashScreen.close();
+            }
+        }
     }
 
     property alias __positionSource: _PositionSource
@@ -132,9 +156,12 @@ Rectangle {
     }
 
     Views.SplashScreen {
+        id: _splashScreen
         anchors.fill: parent
 
-        visible: !_parse.isUserAuthenticated
+        onClosing: {
+            close();
+        }
 
         z: 2
     }

@@ -5,7 +5,15 @@ import "../utils" as Utils
 Rectangle {
     id: root
 
-    signal close
+    signal closing
+
+    function close() {
+        visible = false;
+    }
+
+    function open() {
+        visible = true;
+    }
 
     ListView {
         id: _ListViewImages
@@ -35,7 +43,7 @@ Rectangle {
                 }
 
                 onRegistrationSuccessful: {
-                    root.close();
+                    root.closing();
                 }
             }
         }
@@ -52,7 +60,7 @@ Rectangle {
                 }
 
                 onRegistrationSuccessful: {
-                    root.close();
+                    root.closing();
                 }
             }
         }
