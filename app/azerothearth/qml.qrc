@@ -65,6 +65,7 @@
 		<file>qml/views/ColumnDivider.qml</file>
 		<file>qml/views/Dialog.qml</file>
 		<file>qml/views/FadeBottom.qml</file>
+		<file>qml/views/FadeTop.qml</file>
 		<file>qml/views/Header.qml</file>
 		<file>qml/views/HeaderRegionButton.qml</file>
 		<file>qml/views/Label.qml</file>

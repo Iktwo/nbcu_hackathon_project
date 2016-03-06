@@ -40,7 +40,7 @@ Rectangle {
         anchors.topMargin: __theme.dp(16)
         anchors.bottomMargin: __theme.dp(10)
 
-        font.pixelSize: __theme.dp(root.height*0.40)
+        font.pixelSize: __theme.dp(root.height*0.35)
 
         verticalAlignment: Text.AlignVCenter
         horizontalAlignment: Text.AlignHCenter

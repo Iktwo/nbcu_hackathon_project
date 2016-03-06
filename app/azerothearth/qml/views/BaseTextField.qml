@@ -136,7 +136,7 @@ Rectangle {
         anchors.topMargin: __theme.dp(10)
         anchors.bottomMargin: anchors.topMargin
 
-        font.pixelSize: __theme.dp(root.height*0.45)
+        font.pixelSize: __theme.dp(root.height*0.40)
 
         verticalAlignment: Text.AlignVCenter
 

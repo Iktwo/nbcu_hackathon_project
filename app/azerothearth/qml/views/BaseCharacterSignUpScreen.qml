@@ -19,7 +19,31 @@ Item {
         fillMode: Image.PreserveAspectCrop
     }
 
+    FadeTop {
+        id: _fadeTop
+        anchors.left: parent.left
+        anchors.right: parent.right
+    }
+
+    Label {
+        id: _labelDescription
+        anchors.left: _baseFormColumn.left
+        anchors.right: _baseFormColumn.right
+        anchors.bottom: _baseFormColumn.top
+        anchors.top: parent.top
+        anchors.topMargin: __theme.dp(40)
+        wrapMode: Text.WordWrap
+        font.pixelSize: __theme.dp(64)
+
+        horizontalAlignment: Text.AlignLeft
+
+        text: "Join the\n" + (root.characterType == "CHARACTERTYPE_ORC" ? "Orc Army" : "Human Collective")
+        font.capitalization: Font.AllUppercase
+        color: "#c7c9b4"
+    }
+
     BaseFormColumn {
+        id: _baseFormColumn
 
         onBackClicked: {
             root.backClicked();
