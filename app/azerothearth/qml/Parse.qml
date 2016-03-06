@@ -7,6 +7,8 @@ Item {
 
     readonly property bool isUserAuthenticated: internal.sessionToken !== ""
 
+    property var userObject: null
+
     property string version: "1"
     property string urlBase: "https://api.parse.com/"+version+"/"
     property string urlClasses: urlBase + "classes/"
@@ -25,6 +27,7 @@ Item {
     property string errorStringUsernameTooShort: "USERNAME_TOO_SHORT"
     property string errorStringPasswordTooShort: "PASSWORD_TOO_SHORT"
     property string errorStringPasswordIncorrect: "PASSWORD_INCORRECT"
+    property string errorStringUserHasAlreadyClaimedResource: "USER_HAS_ALREADY_CLAIMED_RESOURCE"
 
 
     function foursquare_scrapeMonuments(callback) {
@@ -101,7 +104,7 @@ Item {
         function __buildXhr(httpType, url, obj, callback) {
             var xhr = new XMLHttpRequest();
 
-            if (httpType === "GET") {
+            if (httpType === "GET" || httpType === "PUT") {
                 var getUrl = url + "/?";
                 var keys = Object.keys(obj);
                 for (var i = 0; i < keys.length; i++) {
@@ -123,12 +126,8 @@ Item {
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
                     var result = JSON.parse(xhr.responseText);
-                    var error = true;
-                    if (result.objectId) {
-                        error = false;
-                    }
                     if (callback) {
-                        callback(result, error);
+                        callback(result);
                     } else {
                         console.warn("callback not found");
                     }
@@ -145,6 +144,14 @@ Item {
             }
         }
 
+        function del(url, obj, callback) {
+            __buildXhr("DELETE", url, obj, callback);
+        }
+
+        function put(url, obj, callback) {
+            __buildXhr("PUT", url, obj, callback);
+        }
+
         function post(url, obj, callback) {
             __buildXhr("POST", url, obj, callback);
         }
@@ -159,6 +166,16 @@ Item {
 
         function getClass(className, obj, callback) {
             get(urlClasses + className, obj, callback);
+
+            console.log(urlClasses + className);
+        }
+
+        function putClass(className, obj, callback) {
+            put(urlClasses + className + "/" + obj.objectId, obj, callback);
+        }
+
+        function deleteClass(className, obj, callback) {
+            del(urlClasses + className + "/" + obj.objectId, obj, callback);
         }
 
         function validateSession(sessionToken) {
@@ -298,6 +315,8 @@ Item {
                     console.warn("user logged in successfully but no session token not found");
                 }
 
+                root.userObject = result;
+
                 callback({
                              status: 1,
                              result: result,
@@ -336,7 +355,97 @@ Item {
 
     // Get a list of Resource POIs
     function getResourcePois(obj, callback) {
-        internal.getClass(classNameResource, obj || { }, callback);
+        var o = obj || { }
+        o.available = true;
+        internal.getClass(classNameResource, o, callback);
+    }
+
+    function getClosestBase(latLongObject, callback) {
+
+        if (!latLongObject) {
+            console.warn("provide latLongObject");
+            return;
+        }
+
+        var o = {
+            "limit" : 3,
+            "where" : '{ "location": { "$nearSphere": { "__type": "GeoPoint", "latitude": ' + latLongObject.latitude + ', "longitude": ' + latLongObject.longitude + ' } } }'
+        }
+
+        internal.getClass(classNamePoi, o, callback);
+    }
+
+    function findClosestResource(latLongObject, callback) {
+        if (!latLongObject) {
+            console.warn("provide latLongObject");
+            return;
+        }
+
+        var o = {
+            "where" : '{
+                "available" : true,
+                "location": {
+                    "$nearSphere": {
+                        "__type": "GeoPoint",
+                        "latitude": ' + latLongObject.latitude + ',
+                        "longitude": ' + latLongObject.longitude + '
+                    },
+                    "$maxDistanceInMiles": 1
+                }
+            }'
+        }
+
+        internal.getClass(classNameResource, o, callback);
+    }
+
+    function claimResource(resourceObject, callback) {
+        if (!resourceObject) {
+            console.warn("no resourceObject given");
+            return;
+        }
+
+        if (!userObject) {
+            console.warn("user is not logged in");
+            return;
+        }
+
+        if (!resourceObject.allocations) {
+            console.warn("resource has no allocations");
+            return;
+        }
+
+        var allocations = resourceObject.allocations;
+
+        var allocateIndex = -1;
+        for (var i = 0; i < allocations.length; i++) {
+             if (allocations[i] === root.userObject.objectId) {
+                console.warn("this user has already claimed this resource");
+                callback({
+                             status: 0,
+                             result: null,
+                             errorString: root.errorStringUserHasAlreadyClaimedResource
+                         });
+                return;
+            } else if (allocations[i] === "unclaimed") {
+                 allocateIndex = i;
+                 break;
+             }
+        }
+
+        if (allocateIndex === -1) {
+            console.warn("no allocations remaining");
+            return;
+        }
+
+        allocations[allocateIndex] = root.userObject.objectId;
+
+        var unavailable = allocateIndex === allocations.length - 1;
+
+        internal.putClass(classNameResource, {
+                              objectId: resourceObject.objectId,
+                              allocations: allocations,
+                              available: !unavailable
+                          }, callback);
     }
 }
 

@@ -16,7 +16,8 @@ Rectangle {
         height: 100
         color: "red"
         opacity: 0.25
-        anchors.centerIn: parent
+        anchors.top: parent.top
+        anchors.right: parent.right
         MouseArea {
             anchors.fill: parent
             onClicked: {

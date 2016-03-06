@@ -5,9 +5,14 @@ import QtQuick.Controls 1.4 as Controls
 import QtPositioning 5.5
 
 Window {
+    id: root
+
     visible: true
     width: 800
     height: 600
+
+
+    property var closestResource: null
 
     QtObject {
         id: internal
@@ -102,7 +107,8 @@ Window {
                                 "longitude" : venue.location.lng
                             },
                             "type" : "RESOURCETYPE_GOLD",
-                            "allocations" : arr
+                            "allocations" : arr,
+                            "available" : true
                         }
 
                         _parse.postResourcePoi(o);
@@ -132,7 +138,7 @@ Window {
         Controls.Button {
             text: "login User object"
             onClicked: {
-                _parse.loginUser("test123", "test123", function(result) {
+                _parse.loginUser("test", "test", function(result) {
                     console.log("loginUser result:");
                     console.log(JSON.stringify(result))
                 });
@@ -150,6 +156,42 @@ Window {
             text: "get resource POI"
             onClicked: {
                 _parse.getResourcePois({ }, function(result) {
+                    console.log(JSON.stringify(result, null, 2))
+                });
+            }
+        }
+
+        Controls.Button {
+            text: "get closest base to Lat Long"
+            onClicked: {
+                _parse.getClosestBase({
+                                          "latitude" : 37.74306701210999,
+                                          "longitude" : -122.42217429437534
+                                      }, function(result) {
+                                          console.log(JSON.stringify(result, null, 2))
+                                      });
+            }
+        }
+
+        Controls.Button {
+            text: "get closest resource to Lat Long"
+            onClicked: {
+                _parse.findClosestResource({
+                                               "latitude" : 37.781976,
+                                               "longitude" : -122.404690
+                                           }, function(result) {
+                                               console.log(JSON.stringify(result, null, 2))
+                                               root.closestResource = result.results[0];
+                                           });
+            }
+        }
+
+        Controls.Button {
+            text: "claim closest (" + root.closestResource + ")"
+            onClicked: {
+                if (!root.closestResource) return;
+                console.log(JSON.stringify(root.closestResource, null, 2));
+                _parse.claimResource(root.closestResource, function(result) {
                     console.log(JSON.stringify(result, null, 2))
                 });
             }
