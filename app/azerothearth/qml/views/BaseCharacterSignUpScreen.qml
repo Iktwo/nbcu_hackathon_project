@@ -39,16 +39,31 @@ Item {
         anchors.fill: parent
         onClicked: {
             _rectangleMessage.visible = false;
+            _labelMessage.text = "";
         }
         visible: _rectangleMessage.visible
+        Rectangle {
+            anchors.fill: parent
+            color: "#000000"
+            opacity: 0.5
+        }
+
+        z: 2
     }
 
     Rectangle {
         id: _rectangleMessage
+
+        function showWithMessage(message) {
+            _labelMessage.text = message;
+            visible = true;
+        }
+
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: __theme.dp(80)
         anchors.rightMargin: __theme.dp(80)
+        anchors.verticalCenter: parent.verticalCenter
 
         height: __theme.dp(400)
         radius: __theme.dp(40)
@@ -57,15 +72,17 @@ Item {
 
 
         Label {
+            id: _labelMessage
             anchors.left: parent.left
             anchors.right: parent.right
             anchors.leftMargin: __theme.dp(30)
             anchors.rightMargin: __theme.dp(30)
             anchors.verticalCenter: parent.verticalCenter
             wrapMode: Text.WordWrap
-
-            text: "Username and password must be at least 3 characters in length"
+            color: "#ffffff"
         }
+
+        z: 3
     }
 
     Column {
@@ -110,12 +127,16 @@ Item {
 
                 _parse.registerUser(userObject, function(result) {
                     if (result.errorString === _parse.errorStringUsernameTaken) {
+                        _rectangleMessage.showWithMessage("Username is not available.")
                         _textFieldUsername.error = true;
                     } else if (result.errorString === _parse.errorStringUsernameNotDefined
-                               || result.errorString === _parse.errorStringUsernameTooShort
-                               || result.errorString === _parse.errorStringPasswordNotDefined
+                               || result.errorString === _parse.errorStringUsernameTooShort) {
+                        _textFieldUsername.error = true;
+                        _rectangleMessage.showWithMessage("Username must be at least 3 characters in length.")
+                    } else if (result.errorString === _parse.errorStringPasswordNotDefined
                                || result.errorString === _parse.errorStringPasswordTooShort) {
-                        _rectangleMessage.visible = true;
+                        _textFieldPassword.error = true;
+                        _rectangleMessage.showWithMessage("Password must be at least 3 characters in length.")
                     }
                     else {
                         root.registrationSuccessful(_textFieldUsername.text);

@@ -140,6 +140,9 @@ Item {
             return;
         }
 
+        console.log("attempting to register user:");
+        console.log(JSON.stringify(userObject, null, 2));
+
         internal.post(urlUsers, userObject, function(result, error) {
             var errorString = "";
             if (error) {
