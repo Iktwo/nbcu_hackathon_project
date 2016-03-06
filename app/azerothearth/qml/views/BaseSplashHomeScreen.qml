@@ -17,6 +17,8 @@ Item {
         _stateGroup.state = "ready";
     }
 
+    Utils.ClickGuard { }
+
     StateGroup {
         id: _stateGroup
         states: [
@@ -64,6 +66,11 @@ Item {
                     target: root
                     opacity: 0.0
                     visible: false
+                }
+                StateChangeScript {
+                    script: {
+                        _ListViewImages.currentIndex = 1;
+                    }
                 }
             }
         ]
@@ -307,7 +314,6 @@ Item {
         visible: false
 
         onBackClicked: {
-//            _baseFormColumn.visible = false;
             _stateGroup.state = "ready";
         }
 

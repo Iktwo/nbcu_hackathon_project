@@ -1,4 +1,6 @@
-import QtQuick 2.0
+import QtQuick 2.4
+
+import "../utils" as Utils
 
 Rectangle {
     id: root
@@ -37,6 +39,7 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.leftMargin: __theme.dp(20)
+        anchors.rightMargin: anchors.leftMargin
         anchors.topMargin: __theme.dp(16)
         anchors.bottomMargin: __theme.dp(10)
 
@@ -46,8 +49,9 @@ Rectangle {
         horizontalAlignment: Text.AlignHCenter
         font.capitalization: Font.AllUppercase
 
-
         color: root.themeColor
+
+        Utils.Fill { }
     }
 }
 
