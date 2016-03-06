@@ -21,6 +21,7 @@ Item {
     property string errorStringPasswordNotDefined: "PASSWORD_NOT_DEFINED"
     property string errorStringUsernameTooShort: "USERNAME_TOO_SHORT"
     property string errorStringPasswordTooShort: "PASSWORD_TOO_SHORT"
+    property string errorStringPasswordIncorrect: "PASSWORD_INCORRECT"
 
 
     function foursquare_scrapeMonuments(callback) {
@@ -188,7 +189,7 @@ Item {
             var errorString = "";
             if (error) {
                 if (result.code == 201 || result.code == 101) {
-                    errorString = "PASSWORD_INCORRECT";
+                    errorString = root.errorStringPasswordIncorrect;
                 }
                 callback({
                              status: 0,

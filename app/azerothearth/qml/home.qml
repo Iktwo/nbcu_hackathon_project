@@ -134,11 +134,14 @@ Rectangle {
     Views.SplashScreen {
         anchors.fill: parent
 
-        onClose: {
-            visible = false;
-            // DO SHIT
-        }
+        visible: !_parse.isUserAuthenticated
 
         z: 2
+    }
+
+    property alias __dialog: _dialog
+    Views.Dialog {
+        id: _dialog
+        z: 10
     }
 }

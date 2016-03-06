@@ -62,10 +62,8 @@ Window {
                         var o = {
                             "id" : venue.id,
                             "name" : venue.name,
-                            "coordinate" : {
-                                "latitude" : venue.location.lat,
-                                "longitude" : venue.location.lng
-                            }
+                            "lat" : venue.location.lat,
+                            "lng" : venue.location.lng
                         }
                         _parse.postPoi(o);
                     }
