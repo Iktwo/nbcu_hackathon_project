@@ -117,6 +117,26 @@ Window {
             }
         }
         Controls.Button {
+            text: "post test User object"
+            onClicked: {
+                var userObject = _parse.buildUserObject("test", "test");
+                userObject.characterType = Math.floor(Math.random()*2) ?
+                            internal.characterTypeOrc
+                          : internal.characterTypeHuman;
+
+                userObject.location = {
+                    __type: "GeoPoint",
+                    latitude: 37.3839200,
+                    longitude: -122.0128440,
+                }
+
+                _parse.registerUser(userObject, function(result) {
+                    console.log("registerUser result:");
+                    console.log(JSON.stringify(result))
+                });
+            }
+        }
+        Controls.Button {
             text: "post User object"
             onClicked: {
                 var userObject = _parse.buildUserObject("test"+Math.floor(Math.random()*1000), "test123");
@@ -194,6 +214,32 @@ Window {
                 _parse.claimResource(root.closestResource, function(result) {
                     console.log(JSON.stringify(result, null, 2))
                 });
+            }
+        }
+
+
+        Controls.Button {
+            text: "increment gold"
+            onClicked: {
+                _parse.incrementResourceTypeGoldCount(function(result) {
+                    _parse.refreshUserInformation();
+                });
+            }
+        }
+
+        Controls.Button {
+            text: "decrement gold"
+            onClicked: {
+                _parse.decrementResourceTypeGoldCount(function(result) {
+                    _parse.refreshUserInformation();
+                });
+            }
+        }
+
+        Controls.Button {
+            text: "refresh user"
+            onClicked: {
+                _parse.refreshUserInformation();
             }
         }
     }

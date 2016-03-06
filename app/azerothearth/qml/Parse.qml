@@ -121,10 +121,16 @@ Item {
 
             xhr.setRequestHeader("X-Parse-Application-Id", root.appId);
             xhr.setRequestHeader("X-Parse-REST-API-Key", root.apiKey);
+            if (internal.sessionToken) {
+                xhr.setRequestHeader("X-Parse-Session-Token", internal.sessionToken);
+            }
             xhr.setRequestHeader("Content-Type", "application/json");
 
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
+                    console.log("### START RESPONSE");
+                    console.log(xhr.responseText);
+                    console.log("### END RESPONSE");
                     var result = JSON.parse(xhr.responseText);
                     if (callback) {
                         callback(result);
@@ -165,13 +171,18 @@ Item {
         }
 
         function getClass(className, obj, callback) {
-            get(urlClasses + className, obj, callback);
+
+            var addition = obj.objectId ? "/" + obj.objectId : "";
+
+            get(urlClasses + className + addition, obj, callback);
 
             console.log(urlClasses + className);
         }
 
         function putClass(className, obj, callback) {
-            put(urlClasses + className + "/" + obj.objectId, obj, callback);
+            var o = JSON.parse(JSON.stringify(obj));
+            delete o.objectId;
+            put(urlClasses + className + "/" + obj.objectId, o, callback);
         }
 
         function deleteClass(className, obj, callback) {
@@ -189,6 +200,8 @@ Item {
 
             xhr.onreadystatechange = function() {
                 if (xhr.readyState == 4) {
+
+                    console.log("RESULT", "https://api.parse.com/1/users/me", xhr.responseText);
                     var result = JSON.parse(xhr.responseText);
                     var error = true;
                     if (result.objectId) {
@@ -197,10 +210,12 @@ Item {
 
                     if (!error) {
                         internal.sessionToken = sessionToken;
+                        root.userObject = result;
                     }
                 }
             }
 
+            console.log("GET", "https://api.parse.com/1/users/me");
             xhr.send();
         }
 
@@ -225,7 +240,6 @@ Item {
         }
 
     }
-
 
     function registerUser(userObject, callback) {
         if (!userObject.username) {
@@ -252,6 +266,8 @@ Item {
         console.log(JSON.stringify(userObject, null, 2));
 
         userObject.username = userObject.username.toLowerCase();
+        // Give the user 1 resourceTypeGold
+        userObject.resourceTypeGoldCount = 1;
 
         internal.post(urlUsers, userObject, function(result, error) {
             var errorString = "";
@@ -368,11 +384,76 @@ Item {
         }
 
         var o = {
-            "limit" : 3,
-            "where" : '{ "location": { "$nearSphere": { "__type": "GeoPoint", "latitude": ' + latLongObject.latitude + ', "longitude": ' + latLongObject.longitude + ' } } }'
+            "where" : '{
+                "available" : true,
+                "location": {
+                    "$nearSphere": {
+                        "__type": "GeoPoint",
+                        "latitude": ' + latLongObject.latitude + ',
+                        "longitude": ' + latLongObject.longitude + '
+                    },
+                    "$maxDistanceInMiles": 1
+                }
+            }'
         }
 
         internal.getClass(classNamePoi, o, callback);
+    }
+
+    function claimPoi(poiObject, callback) {
+        if (!poiObject) {
+            console.warn("no resourceObject given");
+            return;
+        }
+
+        if (!userObject) {
+            console.warn("user is not logged in");
+            return;
+        }
+
+        // []
+        // Check if have enough money
+        // Deploy Soldiers
+        // Else return
+
+        if (!poiObject.available) {
+            // []
+            // Schedule Battle if necessary
+        }
+
+        // delete after
+        var allocations = resourceObject.allocations;
+
+        var allocateIndex = -1;
+        for (var i = 0; i < allocations.length; i++) {
+            if (allocations[i] === root.userObject.objectId) {
+                console.warn("this user has already claimed this resource");
+                callback({
+                             status: 0,
+                             result: null,
+                             errorString: root.errorStringUserHasAlreadyClaimedResource
+                         });
+                return;
+            } else if (allocations[i] === "unclaimed") {
+                allocateIndex = i;
+                break;
+            }
+        }
+
+        if (allocateIndex === -1) {
+            console.warn("no allocations remaining");
+            return;
+        }
+
+        allocations[allocateIndex] = root.userObject.objectId;
+
+        var unavailable = allocateIndex === allocations.length - 1;
+
+        internal.putClass(classNameResource, {
+                              objectId: resourceObject.objectId,
+                              allocations: allocations,
+                              available: !unavailable
+                          }, callback);
     }
 
     function findClosestResource(latLongObject, callback) {
@@ -418,7 +499,7 @@ Item {
 
         var allocateIndex = -1;
         for (var i = 0; i < allocations.length; i++) {
-             if (allocations[i] === root.userObject.objectId) {
+            if (allocations[i] === root.userObject.objectId) {
                 console.warn("this user has already claimed this resource");
                 callback({
                              status: 0,
@@ -427,9 +508,9 @@ Item {
                          });
                 return;
             } else if (allocations[i] === "unclaimed") {
-                 allocateIndex = i;
-                 break;
-             }
+                allocateIndex = i;
+                break;
+            }
         }
 
         if (allocateIndex === -1) {
@@ -446,6 +527,36 @@ Item {
                               allocations: allocations,
                               available: !unavailable
                           }, callback);
+    }
+
+    function incrementResourceTypeGoldCount(callback) {
+        if (!root.userObject) {
+            console.warn("must be logged in");
+            return;
+        }
+
+        var o = {
+            resourceTypeGoldCount: {"__op": "Increment", "amount": 1 }
+        }
+
+        internal.put(urlUsers + "/" + root.userObject.objectId, o, callback);
+    }
+
+    function decrementResourceTypeGoldCount(callback) {
+        if (!root.userObject) {
+            console.warn("must be logged in");
+            return;
+        }
+
+        var o = {
+            resourceTypeGoldCount: {"__op": "Increment", "amount": -1 }
+        }
+
+        internal.put(urlUsers + "/" + root.userObject.objectId, o, callback);
+    }
+
+    function refreshUserInformation() {
+        internal.validateSession(internal.sessionToken);
     }
 }
 
