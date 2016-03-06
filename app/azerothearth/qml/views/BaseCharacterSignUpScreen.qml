@@ -120,7 +120,7 @@ Item {
 
                 if (__positionSource.coordinate) {
                     userObject.coordinate = {
-                        latitude: __position.coordinate.latitude,
+                        latitude: __positionSource.coordinate.latitude,
                         longitude: __positionSource.coordinate.longitude
                     }
                 }
