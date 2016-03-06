@@ -10,6 +10,8 @@ Rectangle {
     property variant defaultLocation: QtPositioning.coordinate(37.78, -122.41)
     property variant lastPosition: defaultLocation
 
+    property var allocations: ({})
+
     ListModel {
         id: _ListModelClaimed
     }
@@ -28,9 +30,11 @@ Rectangle {
             root.updateClosest()
         });
 
+        allocations = {}
         _ListModelResources.clear()
         _parse.getResourcePois({ }, function(result) {
             for (var i = 0; i < result.results.length; ++i) {
+                allocations[result.results[i].objectId] = result.results[i].allocations
                 _ListModelResources.append(result.results[i])
             }
 
@@ -53,7 +57,6 @@ Rectangle {
                 closest = distance
 
             if (distance <= 50) {
-                _ListModelNearResources.append(model)
                 var claimed = false
 
                 for (var j = 0; j < _ListModelClaimed.count; ++j) {
@@ -140,7 +143,7 @@ Rectangle {
 
                         anchors.horizontalCenter: parent.horizontalCenter
 
-                        source: "../img/marker-orc.png"
+                        source: _parse.userObject.characterType === "CHARACTERTYPE_ORC" ? "../img/marker-orc.png" : "../img/marker-human.png"
                         fillMode: Image.PreserveAspectFit
                         height: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
                         width: __theme.dp(Math.min(12 * _Map.zoomLevel, 128))
@@ -222,6 +225,7 @@ Rectangle {
             text: qsTr("Grab gold")
             onClicked: {
                 var model = _ListModelNearResources.get(0)
+                model.allocations = root.allocations[model.objectId]
                 _parse.claimResource(model, function() {
                     _parse.incrementResourceTypeGoldCount(function() {
                         _ListModelClaimed.append(model)
