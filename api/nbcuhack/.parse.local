@@ -1,0 +1,10 @@
+{
+  "applications": {
+    "_default": {
+      "link": "nbcuhack"
+    },
+    "nbcuhack": {
+      "applicationId": "UPJFfR8GO7kXYFPicuKK0mdakfcL73vU4PwzsiV9"
+    }
+  }
+}

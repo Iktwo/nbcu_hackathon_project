@@ -17,6 +17,8 @@ Item {
 
     property string classNamePoi: "poi"
     property string classNameResource: "resource"
+    property string classNameSoldier: "soldier"
+    property string classNameBattle: "battle"
 
     property string appId: "UPJFfR8GO7kXYFPicuKK0mdakfcL73vU4PwzsiV9"
     property string apiKey: "lUbm8jUTe7efq4dbgzV88bMoZ1G2kE1TPDB6V0Sk"
@@ -28,7 +30,9 @@ Item {
     property string errorStringPasswordTooShort: "PASSWORD_TOO_SHORT"
     property string errorStringPasswordIncorrect: "PASSWORD_INCORRECT"
     property string errorStringUserHasAlreadyClaimedResource: "USER_HAS_ALREADY_CLAIMED_RESOURCE"
+    property string errorStringNotEnoughGold: "NOT_ENOUGH_GOLD"
 
+    property int goldCostPerSoldier: 5
 
     function foursquare_scrapeMonuments(callback) {
         var xhr = new XMLHttpRequest();
@@ -400,7 +404,7 @@ Item {
         internal.getClass(classNamePoi, o, callback);
     }
 
-    function claimPoi(poiObject, callback) {
+    function claimPoi(poiObject, numberOfSoldiers, callback) {
         if (!poiObject) {
             console.warn("no resourceObject given");
             return;
@@ -411,49 +415,19 @@ Item {
             return;
         }
 
-        // []
-        // Check if have enough money
-        // Deploy Soldiers
-        // Else return
-
-        if (!poiObject.available) {
-            // []
-            // Schedule Battle if necessary
-        }
-
-        // delete after
-        var allocations = resourceObject.allocations;
-
-        var allocateIndex = -1;
-        for (var i = 0; i < allocations.length; i++) {
-            if (allocations[i] === root.userObject.objectId) {
-                console.warn("this user has already claimed this resource");
-                callback({
-                             status: 0,
-                             result: null,
-                             errorString: root.errorStringUserHasAlreadyClaimedResource
-                         });
-                return;
-            } else if (allocations[i] === "unclaimed") {
-                allocateIndex = i;
-                break;
-            }
-        }
-
-        if (allocateIndex === -1) {
-            console.warn("no allocations remaining");
+        if (root.userObject.resourceTypeGoldCount < numberOfSoldiers*root.goldCostPerSoldier) {
+            console.warn("not enough gold to purchase");
+            callback({status: 0, errorString: root.errorStringNotEnoughGold });
             return;
         }
 
-        allocations[allocateIndex] = root.userObject.objectId;
+        deploySoldiers(poiObject, numberOfSoldiers);
 
-        var unavailable = allocateIndex === allocations.length - 1;
-
-        internal.putClass(classNameResource, {
-                              objectId: resourceObject.objectId,
-                              allocations: allocations,
-                              available: !unavailable
-                          }, callback);
+        if (!poiObject.available) {
+            // []
+            // Start Battle if necessary
+            // Execute battle here
+        }
     }
 
     function findClosestResource(latLongObject, callback) {
@@ -557,6 +531,110 @@ Item {
 
     function refreshUserInformation() {
         internal.validateSession(internal.sessionToken);
+    }
+
+    function deploySoldiers(poiObject, numberOfSoldiers) {
+        var soldier = {
+            userObjectId: root.userObject.objectId,
+            poiObjectId: poiObject.objectId,
+            characterType: root.userObject.characterType,
+            available: true,
+            count: numberOfSoldiers
+        }
+        internal.postClass(classNameSoldier, soldier, function(result) {
+            console.log("RESPONSE", "deploySoldiers");
+            console.log(JSON.stringify(result));
+        });
+    }
+
+    function getSoldierCountForPoi(poiObject, callback) {
+        var o = {
+            poiObjectId: poiObject.objectId,
+            available: true
+        }
+
+        internal.getClass(classNameSoldier, o, callback);
+    }
+
+    function executeBattle(poiObject) {
+        console.log("execute battle for " + JSON.stringify(poiObject));
+
+        getSoldierCountForPoi(poiObject, function(result) {
+
+            console.log("RESPONSE", JSON.stringify(result));
+
+            var countOrc = 0;
+            var countHuman = 0;
+
+            var soldiers = result;
+
+            for (var i = 0; i < soldiers.length; i++) {
+                var r = soldiers[i];
+                if (r.characterType === "CHARACTERTYPE_ORC") {
+                    countOrc++;
+                } else if (r.characterType === "CHARACTERTYPE_HUMAN") {
+                    countHuman++;
+                }
+            }
+
+            // Find number of soldiers at POIObject for CharacterType ORC
+            // Find number of soldiers at POIObject for CharacterType HUMAN
+
+            var winningCharacterType = "";
+            var losingCharacterType = "";
+
+            if (countOrc > countHuman) {
+                winningCharacterType = "CHARACTERTYPE_ORC";
+                losingCharacterType = "CHARACTERTYPE_HUMAN";
+            } else if (countHuman > countOrc) {
+                winningCharacterType = "CHARACTERTYPE_HUMAN";
+                losingCharacterType = "CHARACTERTYPE_ORC";
+            } else {
+                console.log("### BATTLE ###")
+                console.log("### RESULT ###")
+                console.log("#### IS A ####")
+                console.log("~~~~ TIE ~~~~~")
+                console.log("##############")
+                console.log("##############")
+                console.log("##############")
+                return;
+            }
+
+            var battle = {
+                initiatingUserObjectId: root.userObject.objectId,
+                poiObjectId: poiObject.objectId,
+                winningCharacterType: winningCharacterType,
+                losingCharacterType: losingCharacterType
+            }
+
+            internal.postClass(classNameBattle, battle, function(result) {
+                console.log("RESULT", "battle completed, killing soldiers...");
+                console.log(JSON.stringify(result));
+
+                // Set "available" for battling soldiers to false
+                var batchRequest = [];
+                for (var j = 0; j < soldiers.length; i++) {
+                    var kk = {
+                        "method": "POST",
+                        "path": "/1/classes/" + root.classNameSoldier,
+                        "body": {
+                            "available": false,
+                            "objectId": soldiers[i].objectId
+                        }
+                    }
+                    batchRequest.push(kk);
+                }
+
+                var finalObject = {
+                    requests : batchRequest
+                }
+
+                internal.post(urlBase + "batch", finalObject, function(result) {
+                    console.log("RESPONSE", "battle totally done");
+                    console.log(JSON.stringify(result))
+                });
+            });
+        });
     }
 }
 

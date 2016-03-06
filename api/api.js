@@ -1,24 +1,27 @@
 var express = require('express');
-var ParseServer = require('parse-server').ParseServer;
 
-var app = express();
-var api = new ParseServer({
-	databaseURI: 'mongodb://127.0.0.1:27017',
-      appId: 'nbcuhackAppId',
-      fileKey: 'nbcuhackFileKey',
-      masterKey: 'nbcuhackSecretKey',
-      serverURL: 'http://localhost:1337'
+var Parse = require('node-parse-api').Parse;
+
+var options = {
+	app_id: 'UPJFfR8GO7kXYFPicuKK0mdakfcL73vU4PwzsiV9',
+	api_key: 'lUbm8jUTe7efq4dbgzV88bMoZ1G2kE1TPDB6V0Sk'
+}
+
+var parse = new Parse(options);
+
+parse.loginUser('test', 'test', function (error, response) {
+  // response = {sessionToken: '', createdAt: '', ... } 
+  console.log(response);
 });
 
-// Serve the Parse API at /parse URL prefix
-app.use('/parse', api);
+var app = express();
 
 // Parse Server plays nicely with the rest of your web routes
 app.get('/', function(req, res) {
-  res.status(200).send('nbcuhack');
+	res.status(200).send('nbcuhack');
 });
 
 var port = 1337;
 app.listen(port, function() {
-  console.log('parse-server-example running on port ' + port + '.');
+	console.log('example running on port ' + port + '.');
 });
