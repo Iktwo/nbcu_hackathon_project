@@ -73,33 +73,6 @@ Item {
         xhr.send();
     }
 
-    function saveUserWithClass(callback){
-        internal.post("http://nbcu.mybluemix.net/api/player/update/", characterShortName, function(result, error){
-            var errorString = "";
-            if (error) {
-                if (result.code === 202) {
-                    errorString = root.errorStringUsernameTaken;
-                }
-                callback({
-                             status: 0,
-                             result: result,
-                             errorString: errorString
-                         });
-            } else {
-                try {
-                    internal.sessionToken = result.sessionToken;
-                } catch (ex) {
-                    console.warn("user signed in successfully but no session token not found");
-                }
-                callback({
-                             status: 1,
-                             result: result,
-                             errorString: errorString
-                         });
-            }
-        });
-    }
-
     function foursquare_scrapeVenuesForResources(callback) {
         var xhr = new XMLHttpRequest();
         console.log("scrapeVenuesForResources url:", foursquare.urlVenuesShopsServices)
@@ -351,6 +324,8 @@ Item {
             }
         });
 
+
+
         internal.post(urlUsers, userObject, function(result, error) {
             var errorString = "";
             if (error) {
@@ -374,6 +349,7 @@ Item {
                              errorString: errorString
                          });
             }
+
         });
     }
 
